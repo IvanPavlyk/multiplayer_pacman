@@ -1,7 +1,7 @@
-import './app.css';
+import "./app.css";
 import { BrowserRouter } from "react-router-dom";
-import Router from "./Router"
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Router from "../Router/Router";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         <Router />
       </BrowserRouter>
     </div>
-  )
-}
+  );
+};
 
 export default App;
