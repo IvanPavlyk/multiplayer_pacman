@@ -7,6 +7,7 @@ const Room = () => {
     return (
       <div>
         <Link to='/login'>To Login</Link>
+        <Link to='/room'>To Room</Link>
       </div>
     );
 };
