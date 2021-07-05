@@ -1,14 +1,18 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import Login from "../Pages/Login";
 
+import Root from "pages/Root";
+import Login from "pages/Login";
+import Room from "pages/Room";
 
 const Router = () => {
     return (
         <main>
             <Switch>
-                <Route path="/login" exact component={Login} />
-                <Redirect to="/login" />
+                <Route path="/" exact component={Root}/>
+                <Route path="/login" exact component={Login}/>
+                <Route path="/room" exact component={Room}/>
+                <Redirect to="/"/>
             </Switch>
         </main>
     );
