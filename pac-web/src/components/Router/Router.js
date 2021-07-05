@@ -1,14 +1,18 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import Login from "../Pages/Login";
 
+import Root from "pages/Root";
+import Login from "pages/Login";
+import Lobby from "pages/Lobby";
 
 const Router = () => {
     return (
         <main>
             <Switch>
-                <Route path="/login" exact component={Login} />
-                <Redirect to="/login" />
+                <Route path="/" exact component={Root}/>
+                <Route path="/login" exact component={Login}/>
+                <Route path="/lobby" exact component={Lobby}/>
+                <Redirect to="/"/>
             </Switch>
         </main>
     );
