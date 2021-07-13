@@ -4,6 +4,13 @@ const game = {
   width: 800,
   height: 800,
   type: Phaser.AUTO,
+  physics: {
+    default: 'arcade',
+    arcade: {
+        //gravity: { y: -300 },
+        debug: false
+    }
+  },
   scene: MainScene,
 };
 
