@@ -1,22 +1,10 @@
-import { MainScene } from './scenes/main';
+import Phaser from "phaser";
+import { MainScene } from "./scenes/main";
+const game = {
+  width: 800,
+  height: 800,
+  type: Phaser.AUTO,
+  scene: MainScene,
+};
 
-const config = {
-  width: 512,
-  height: 512,
-  render: {
-    antialias: false,
-    pixelArt: true,
-    roundPixels: true
-  },
-
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 400 },
-      debug: true
-    }
-  },
-  scene: MainScene
-}
-
-export default config;
+export default game;
