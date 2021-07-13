@@ -1,9 +1,8 @@
-import React from 'react';
-import { GameComponent } from 'phaser-react-tools';
-import config from './config';
+import React from "react";
+import { IonPhaser } from "@ion-phaser/react";
+import game from "./config";
+const App = () => {
+  return <IonPhaser game={game} />;
+};
 
-const GameCanvas = (props) => (
-	<GameComponent config={config} {...props}/>
-)
-
-export default GameCanvas;
+export default App;

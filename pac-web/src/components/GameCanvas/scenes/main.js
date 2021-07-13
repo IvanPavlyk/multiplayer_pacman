@@ -1,23 +1,26 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
 
 export class MainScene extends Phaser.Scene {
-  init() {
-    this.cameras.main.setBackgroundColor('#24252A')
-  }
+  preload() {
+    this.load.image("tiles", "chompermazetiles.png");
 
+    // var json = require("../level/map.json");
+    var json2 = require("../level/map2.json");
+
+    // this.load.tilemapTiledJSON("tilemap", json);
+    this.load.tilemapTiledJSON("tilemap2", json2);
+  }
   create() {
-    this.helloWorld = this.add.text(
-      this.cameras.main.centerX, 
-      this.cameras.main.centerY, 
-      "Hello World", { 
-        font: "40px Arial", 
-        color: "#ffffff" 
-      }
-    );
-    this.helloWorld.setOrigin(0.5);
+    // let map = this.make.tilemap({ key: "tilemap" });
+    let map2 = this.make.tilemap({ key: "tilemap2" });
+
+    // const tileset = map.addTilesetImage("level_one", "tiles");
+    const tileset2 = map2.addTilesetImage("chompermazetiles", "tiles");
+
+    // this.BaseLayer = map.createLayer("Base", tileset);
+    // this.PelletsLayer = map.createLayer("Pellets", tileset);
+    this.BaseLayer = map2.createLayer("Base", tileset2);
+    this.PelletsLayer = map2.createLayer("Pellets", tileset2);
   }
-	
-  update() {
-    this.helloWorld.angle += 1;
-  }
+  update() {}
 }
