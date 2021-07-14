@@ -11,7 +11,7 @@ const Router = () => {
             <Switch>
                 <Route path="/" exact component={Root}/>
                 <Route path="/login" exact component={Login}/>
-                <Route path="/room" exact component={Room}/>
+                <Route path="/room/:id" component={Room}/>
                 <Redirect to="/"/>
             </Switch>
         </main>

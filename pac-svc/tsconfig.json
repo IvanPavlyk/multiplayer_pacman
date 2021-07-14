@@ -12,9 +12,8 @@
 			"strict": true,
 			"allowJs": true,
 			"strictNullChecks": false,
-			"forceConsistentCasingInFileNames": true
+			"forceConsistentCasingInFileNames": true,
+			"baseUrl": "src"
 	},
-	"include": [
-		"src"
-	]
+	"include": ["src"]
 }
