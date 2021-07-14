@@ -10,14 +10,14 @@ const Room = (props) => {
   const [_, joinRoomById] = useRoom();
 
   useEffect(async () => {
-    const room = window.room || await joinRoomById(id);
+    let room = window.room || await joinRoomById(id);
+    if (room.id !== id) room = await joinRoomById(id);
 
     if (!room) {
       alert('room does not exists');
       return history.push('/');
     }
 
-    setRoomState(room.state)
     room.onStateChange((state) => {
       setRoomState({
         ...roomState, 
