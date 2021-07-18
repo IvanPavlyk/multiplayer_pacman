@@ -11,8 +11,11 @@ class GameRoom extends Room<GameState> {
     /* event listeners */
     this.onMessage("PLAYER_READY", (client, message) => {
       const player = this.state.players.get(client.id);
-      player.ready = !player.ready;
-      console.log(message);
+      player.ready = message?.ready ?? !player.ready;
+    });
+
+    this.onMessage("YO", () => {
+      console.log("YO RECEIVED");
     });
   }
 
@@ -29,15 +32,24 @@ class GameRoom extends Room<GameState> {
   }
 
   async onLeave(client: Client) {
-    // this.state.players.delete(client.id);
+    const player = this.state.players.get(client.id);
+    this.state.players.delete(client.id);
+
     try {
-      await this.allowReconnection(client, 1);
-    } catch (error) {
-      this.state.players.delete(client.id);
-    }
+      // allow disconnected client to reconnect into this room until 20 seconds
+      await this.allowReconnection(client, 20);
+      this.state.players.set(client.id, player);
+    } catch (err) {}
   }
 
-  onDispose() {}
+  // async onLeave(client: Client) {
+  //   // this.state.players.delete(client.id);
+  //   try {
+  //     await this.allowReconnection(client, 1);
+  //   } catch (error) {
+  //     this.state.players.delete(client.id);
+  //   }
+  // }
 }
 
 export default GameRoom;

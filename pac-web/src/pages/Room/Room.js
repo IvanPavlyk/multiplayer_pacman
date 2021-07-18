@@ -1,53 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { useRoom } from "hooks/use-room";
+import { useColyseus } from "components/ColyseusClient";
 import { useParams, useHistory } from "react-router-dom";
 import GameCanvas from "components/GameCanvas";
 
 const Room = (props) => {
   const { id } = useParams();
   const history = useHistory();
-  const [roomState, setRoomState] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [_, joinRoomById] = useRoom();
+  const client = useColyseus();
+  const [room, setRoom] = useState(null);
+  const [state, setState] = useState({});
 
   useEffect(() => {
     async function init() {
       let room =
         window.room && window.room.id === id
           ? window.room
-          : await joinRoomById(id);
+          : await client.joinRoomById(id);
       if (typeof room === "undefined") {
         alert("room does not exists");
         history.push("/");
         return history.go();
       }
-      room.onStateChange((state) => {
+      window.room = room;
+      setRoom(room);
+
+      room.onStateChange((newState) => {
         state?.players?.forEach((value, key) => {
           console.log("key =>", key);
           console.log("value =>", value.ready);
         });
-        setRoomState({
-          ...roomState,
+        setState({
           ...state,
+          ...newState,
         });
       });
+
+      room.send("PLAYER_READY", { ready: false });
     }
     init();
-  }, [history, id, joinRoomById, roomState]);
+  }, [client, history, id, state]);
 
-  const readyUp = () => {
-    window.room.send("PLAYER_READY", { data: "yo" });
-  };
+  function ready() {
+    room.send("PLAYER_READY");
+  }
 
   return (
     <div>
-      <p>This is the lobby</p>
-      <GameCanvas />
+      {room != null && <GameCanvas controller={room} />}
 
-      <p>Players in room ({roomState?.players?.size})</p>
-      <p>{JSON.stringify(roomState?.players)}</p>
+      <p>Players in room ({state?.players?.size})</p>
+      <p>{JSON.stringify(state?.players)}</p>
 
-      <button onClick={readyUp}>Ready</button>
+      <button onClick={ready}>Ready</button>
     </div>
   );
 };
