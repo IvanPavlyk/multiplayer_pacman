@@ -10,7 +10,11 @@ const Room = () => {
 
   const createAndJoinRoom = async () => {
     const room = window.room = await client.createNewRoom();
-    history.push(`/room/${room.id}`);
+    joinRoom(room.id)
+  }
+
+  const joinRoom = (id) => {
+    history.push(`/room/${id}`);
   }
 
   return (
@@ -20,12 +24,9 @@ const Room = () => {
       <br/>
       <button onClick={createAndJoinRoom}>Create room</button>
       <br/>
-{/* 
-      <input type='text' value={id} onChange={(e) => setValue(e.target.value)}/>
 
-      <button onClick={() => { 
-        history.push(`/room/${id}`); 
-        }}>Join by id</button> */}
+      <input type='text' value={id} onChange={(e) => setValue(e.target.value)}/>
+      <button onClick={() => joinRoom(id)}>Join by id</button>
     </div>
   );
 };

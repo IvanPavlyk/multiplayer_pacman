@@ -13,10 +13,13 @@ class GameRoom extends Room<GameState> {
 			const player = this.state.players.get(client.id);
 			player.ready = message?.ready ?? !player.ready;
 		});
-	}
 
+		this.onMessage('YO', () => {
+			console.log("YO RECEIVED")
+		})
+	}
+	
 	onJoin(client: Client) {
-		console.log(client.id)
 		this.state.players.set(client.id, new Player());
 	}
 	

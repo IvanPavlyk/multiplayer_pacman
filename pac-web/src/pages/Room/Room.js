@@ -7,16 +7,16 @@ const Room = (props) => {
   const { id } = useParams();
   const history = useHistory();
   const client = useColyseus();
-  const [room, setRoom] = useState();
+  const [room, setRoom] = useState(null);
   const [state, setState] = useState({});
 
   useEffect(async () => {
     const room = (window.room) || await client.joinRoomById(id);
     if (room == null) return history.push('/');
+    window.room = room;
     setRoom(room);
 
     room.onStateChange((newState) => {
-      console.log(newState)
       setState({
         ...state,
         ...newState
@@ -32,8 +32,7 @@ const Room = (props) => {
 
   return (
     <div>
-      <p>This is the lobby</p>      
-      <GameCanvas/>
+      { (room != null) && <GameCanvas controller={room}/> }
 
       <p>Players in room ({ state?.players?.size })</p>
       <p>{ JSON.stringify(state?.players) }</p>

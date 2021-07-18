@@ -2,6 +2,8 @@ import Phaser from "phaser";
 
 export class MainScene extends Phaser.Scene {
   preload() {
+    console.log(this.registry.get('controller'));
+
     this.load.image("tiles", "/chompermazetiles.png");
     this.load.spritesheet('pacman', 
         '/pacman.png',
@@ -15,7 +17,12 @@ export class MainScene extends Phaser.Scene {
     // this.load.tilemapTiledJSON("tilemap", json);
     this.load.tilemapTiledJSON("tilemap2", json2);
   }
+
   create() {
+    const controller = this.registry.get('controller');
+    
+    controller.send('YO')
+
     // let map = this.make.tilemap({ key: "tilemap" });
     let map2 = this.make.tilemap({ key: "tilemap2" });
 
