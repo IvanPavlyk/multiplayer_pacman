@@ -1,11 +1,13 @@
-import { type, Schema } from '@colyseus/schema';
+import { type, Schema } from "@colyseus/schema";
 
 class Player extends Schema {
-	@type('boolean') ready = false;
+  @type("boolean") ready = false;
+  @type("number") id: number;
 
-	constructor() {
-		super();
-	}
+  constructor(id: number) {
+    super();
+    this.id = id;
+  }
 }
 
 export default Player;
