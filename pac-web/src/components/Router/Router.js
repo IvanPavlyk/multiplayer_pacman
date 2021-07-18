@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
-import Root from "pages/Root";
+import Home from "pages/Home";
 import Login from "pages/Login";
 import Room from "pages/Room";
 
@@ -9,7 +9,7 @@ const Router = () => {
     return (
         <main>
             <Switch>
-                <Route path="/" exact component={Root}/>
+                <Route path="/" exact component={Home}/>
                 <Route path="/login" exact component={Login}/>
                 <Route path="/room/:id" component={Room}/>
                 <Redirect to="/"/>

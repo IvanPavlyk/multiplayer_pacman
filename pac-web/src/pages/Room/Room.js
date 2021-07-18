@@ -1,44 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { useRoom } from 'hooks/use-room';
+import { useColyseus } from 'components/ColyseusClient';
 import { useParams, useHistory } from "react-router-dom";
 import GameCanvas from "components/GameCanvas";
 
 const Room = (props) => {
   const { id } = useParams();
   const history = useHistory();
-  const [roomState, setRoomState] = useState(null);
-  const [_, joinRoomById] = useRoom();
+  const client = useColyseus();
+  const [room, setRoom] = useState();
+  const [state, setState] = useState({});
 
   useEffect(async () => {
-    let room = window.room || await joinRoomById(id);
-    if (room.id !== id) room = await joinRoomById(id);
+    const room = (window.room) || await client.joinRoomById(id);
+    if (room == null) return history.push('/');
+    setRoom(room);
 
-    if (!room) {
-      alert('room does not exists');
-      return history.push('/');
-    }
+    room.onStateChange((newState) => {
+      console.log(newState)
+      setState({
+        ...state,
+        ...newState
+      })
+    });
 
-    room.onStateChange((state) => {
-      setRoomState({
-        ...roomState, 
-        ...state
-      });
-    })
+    room.send('PLAYER_READY', { ready: false });
   }, []);
 
-  const readyUp = () => {
-    window.room.send('PLAYER_READY', { data: 'yo' });
-  };
+  function ready() {
+    room.send('PLAYER_READY');
+  }
 
   return (
     <div>
       <p>This is the lobby</p>      
       <GameCanvas/>
 
-      <p>Players in room ({ roomState?.players?.size })</p>
-      <p>{ JSON.stringify(roomState?.players) }</p>
+      <p>Players in room ({ state?.players?.size })</p>
+      <p>{ JSON.stringify(state?.players) }</p>
 
-      <button onClick={readyUp}>Ready</button>
+      <button onClick={ready}>Ready</button>
     </div>
   );
 };

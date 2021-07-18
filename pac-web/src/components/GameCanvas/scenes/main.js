@@ -2,9 +2,9 @@ import Phaser from "phaser";
 
 export class MainScene extends Phaser.Scene {
   preload() {
-    this.load.image("tiles", "chompermazetiles.png");
+    this.load.image("tiles", "/chompermazetiles.png");
     this.load.spritesheet('pacman', 
-        'pacman.png',
+        '/pacman.png',
         { frameWidth: 16, frameHeight: 16 }
     );
     this.cursors = this.input.keyboard.createCursorKeys();

@@ -4,6 +4,7 @@ const game = {
   width: 800,
   height: 800,
   type: Phaser.AUTO,
+  pixelArt: true,
   physics: {
     default: 'arcade',
     arcade: {
