@@ -21,11 +21,15 @@ const Room = () => {
     <div>
       <Link to='/login'>To Login</Link>
 
-      <br/>
+      <br />
       <button onClick={createAndJoinRoom}>Create room</button>
-      <br/>
+      <br />
 
-      <input type='text' value={id} onChange={(e) => setValue(e.target.value)}/>
+      <input
+        type='text'
+        value={id}
+        onChange={(e) => setValue(e.target.value)}
+      />
       <button onClick={() => joinRoom(id)}>Join by id</button>
     </div>
   );

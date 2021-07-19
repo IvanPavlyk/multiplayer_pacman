@@ -1,4 +1,4 @@
-import { type, Schema } from '@colyseus/schema';
+import { type, Schema } from "@colyseus/schema";
 
 class Player extends Schema {
   @type('boolean') ready = false;
