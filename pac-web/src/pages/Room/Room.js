@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { useColyseus } from 'components/ColyseusClient';
-import { useParams, useHistory } from "react-router-dom";
-import GameCanvas from "components/GameCanvas";
+import { useParams, useHistory } from 'react-router-dom';
+import GameCanvas from 'components/GameCanvas';
 
-const Room = (props) => {
+const Room = () => {
   const { id } = useParams();
   const history = useHistory();
   const client = useColyseus();
   const [room, setRoom] = useState(null);
   const [state, setState] = useState({});
 
-  useEffect(async () => {
-    const room = (window.room) || await client.joinRoomById(id);
-    if (room == null) return history.push('/');
-    window.room = room;
-    setRoom(room);
-
-    room.onStateChange((newState) => {
-      setState({
-        ...state,
-        ...newState
-      })
-    });
-
-    room.send('PLAYER_READY', { ready: false });
+  useEffect(() => {
+    (async () => {
+      const room = (window.room) || await client.joinRoomById(id);
+      if (room == null) return history.push('/');
+      window.room = room;
+      setRoom(room);
+  
+      room.onStateChange((newState) => {
+        setState({
+          ...state,
+          ...newState
+        });
+      });
+  
+      room.send('PLAYER_READY', { ready: false });
+    })();
   }, []);
 
   function ready() {
