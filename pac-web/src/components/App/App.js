@@ -1,18 +1,21 @@
-import Router from "components/Router";
-import { BrowserRouter } from "react-router-dom";
+import React from 'react';
+import Router from 'components/Router';
+import { BrowserRouter } from 'react-router-dom';
+import ColyseusClient from 'components/ColyseusClient'; 
 
-import './app.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './app.css';
 
 function App() {
-
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Router />
-      </BrowserRouter>
+    <div className='App'>
+      <ColyseusClient>
+        <BrowserRouter>
+          <Router/>
+        </BrowserRouter>
+      </ColyseusClient>
     </div>
-  )
-};
+  );
+}
 
 export default App;
