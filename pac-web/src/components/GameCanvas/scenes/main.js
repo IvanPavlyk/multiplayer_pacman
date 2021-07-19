@@ -20,12 +20,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.counter = 0;
     this.controller = this.registry.get('controller');
     this.playerDirection = undefined;
     this.otherPlayerDirection = undefined;
     
-    this.controller.send('YO');
-    console.log(this.controller.state);
+    
+   
 
     // let map = this.make.tilemap({ key: "tilemap" });
     let map2 = this.make.tilemap({ key: "tilemap2" });
@@ -37,7 +38,24 @@ export class MainScene extends Phaser.Scene {
     // this.PelletsLayer = map.createLayer("Pellets", tileset);
     this.BaseLayer = map2.createLayer("Base", tileset2);
     this.PelletsLayer = map2.createLayer("Pellets", tileset2);
-
+    console.log(this.PelletsLayer);
+    console.log([].concat(...this.PelletsLayer.layer.data.map((row)=>{
+      //console.log(row);
+      return row.map((ele) =>{
+        //console.log(Number(ele.index != -1));
+        
+        return Number(ele.index != -1);
+      })
+    })));
+    this.controller.send('initMap', {pellets: [].concat(...this.PelletsLayer.layer.data.map((row)=>{
+      //console.log(row);
+      return row.map((ele) =>{
+        //console.log(Number(ele.index != -1));
+        
+        return Number(ele.index != -1);
+      })
+    }))});
+    console.log(this.controller.state);
     this.BaseLayer.setCollisionByExclusion([-1]); 
     this.player = this.physics.add.sprite(42, 42, 'pacman');
     this.otherPlayer = this.physics.add.sprite(-100, -100, 'pacman');
@@ -52,7 +70,7 @@ export class MainScene extends Phaser.Scene {
     // })
 
     this.physics.add.overlap(this.player, this.PelletsLayer, collectPellet, null, this);
-    this.physics.add.overlap(this.otherPlayer, this.PelletsLayer, collectPellet, null, this);
+    // this.physics.add.overlap(this.otherPlayer, this.PelletsLayer, collectPelletOther, null, this);
 
     this.anims.create({
       key: 'moving',
@@ -79,15 +97,20 @@ export class MainScene extends Phaser.Scene {
     // });
     function collectPellet (player, pellet)
     {
-      
+      if(pellet.visible){
+        pellet.setVisible(false);
+        this.controller.send('pelletEaten', { player, pellet : pellet.y*this.PelletsLayer.layer.width + pellet.x });
+        console.log(pellet);
+        console.log(this.PelletsLayer.layer.width);
+      }
       //pellet.disableBody(true, true);
-      pellet.setVisible(false);
       //pellet.destroy();
     };
   }
 
   
   update() {
+    this.counter = (this.counter + 1)%100;
     let sessionId = this.controller.sessionId;
     //console.log(sessionId);
 
@@ -168,15 +191,37 @@ export class MainScene extends Phaser.Scene {
         backendStateOther = value;
       }
     });
-    console.log(this.playerDirection, backendState.direction, backendState);
+    // this.controller.onStateChange((state)=>{
+    //   this.controller.send('locationChanged', { xAdmin: this.player.x, yAdmin: this.player.y });
+    // });
     if(this.playerDirection != backendState.direction){
+      // if(!this.player.anims.isPlaying){
+      //   this.player.anims.play('moving', true);
+      //   this.player.x = backendState.x;
+      //   this.player.y = backendState.y;
+      //   this.playerDirection = backendState.direction;
+      //   window.setInterval(() => {
+      //     this.controller.send('moving', { direction: this.playerDirection, x: this.player.x, y: this.player.y });
+      //   }, 100);
+      // }
+
       this.updatePosition(this.player, backendState);
     }
     if(backendStateOther && this.otherPlayerDirection != backendStateOther.direction){
       this.updatePosition(this.otherPlayer, backendStateOther);
     }
+    // this.updatePosition(this.player, backendState);
+    // this.updatePosition(this.otherPlayer, backendStateOther);
     this.playerDirection = backendState.direction;
     this.otherPlayerDirection = backendStateOther ? backendStateOther.direction: undefined;
+
+    this.controller.state.pellets.forEach((ele, index)=>{
+      // console.log(ele, index, Math.floor(index/this.PelletsLayer.layer.width), index%this.PelletsLayer.layer.width, this.controller.state.pellets.length);
+      this.PelletsLayer.layer.data[Math.floor(index/this.PelletsLayer.layer.width)][index%this.PelletsLayer.layer.width].setVisible(ele);
+    });
+    if(this.counter === 99){
+      this.controller.send('moving', { direction: this.playerDirection, x: this.player.x, y: this.player.y });
+    }
   }
   updatePosition(player, backendState){
     player.anims.play('moving', true);

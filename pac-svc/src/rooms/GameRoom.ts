@@ -14,8 +14,14 @@ class GameRoom extends Room<GameState> {
 			player.ready = message?.ready ?? !player.ready;
 		});
 
-		this.onMessage('YO', () => {
-			console.log("YO RECEIVED");
+		this.onMessage('initMap', (client, message) => {
+			if(!this.state.pellets.length){
+			// console.log("YO RECEIVED");
+			//this.state.pellets = message.pellets;
+				message.pellets.forEach(ele =>{
+					this.state.pellets.push(ele);
+				});
+			}
 		});
 
 		this.onMessage('moving', (client, message) => {
@@ -23,6 +29,9 @@ class GameRoom extends Room<GameState> {
 			player.direction = message?.direction;
 			player.x = message?.x;
 			player.y = message?.y;
+		});
+		this.onMessage('pelletEaten', (client, message) => {
+			this.state.pellets[message.pellet] = 0;
 		});
 	}
 	
