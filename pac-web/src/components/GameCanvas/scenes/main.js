@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 
 export class MainScene extends Phaser.Scene {
   preload() {
-    console.log(this.registry.get("controller"));
+    console.log(this.registry.get('controller'));
 
     this.load.image('tiles', '/chompermazetiles.png');
     this.load.spritesheet('pacman', 
@@ -36,8 +36,8 @@ export class MainScene extends Phaser.Scene {
 
     // this.BaseLayer = map.createLayer("Base", tileset);
     // this.PelletsLayer = map.createLayer("Pellets", tileset);
-    this.BaseLayer = map2.createLayer("Base", tileset2);
-    this.PelletsLayer = map2.createLayer("Pellets", tileset2);
+    this.BaseLayer = map2.createLayer('Base', tileset2);
+    this.PelletsLayer = map2.createLayer('Pellets', tileset2);
     console.log(this.PelletsLayer);
     console.log([].concat(...this.PelletsLayer.layer.data.map((row)=>{
       //console.log(row);
@@ -45,7 +45,7 @@ export class MainScene extends Phaser.Scene {
         //console.log(Number(ele.index != -1));
         
         return Number(ele.index != -1);
-      })
+      });
     })));
     this.controller.send('initMap', {pellets: [].concat(...this.PelletsLayer.layer.data.map((row)=>{
       //console.log(row);
@@ -53,7 +53,7 @@ export class MainScene extends Phaser.Scene {
         //console.log(Number(ele.index != -1));
         
         return Number(ele.index != -1);
-      })
+      });
     }))});
     console.log(this.controller.state);
     this.BaseLayer.setCollisionByExclusion([-1]); 
@@ -73,8 +73,8 @@ export class MainScene extends Phaser.Scene {
     // this.physics.add.overlap(this.otherPlayer, this.PelletsLayer, collectPelletOther, null, this);
 
     this.anims.create({
-      key: "moving",
-      frames: this.anims.generateFrameNumbers("pacman", { start: 0, end: 2 }),
+      key: 'moving',
+      frames: this.anims.generateFrameNumbers('pacman', { start: 0, end: 2 }),
       frameRate: 10,
       repeat: -1,
     });
@@ -115,73 +115,73 @@ export class MainScene extends Phaser.Scene {
 
     if (this.input.keyboard.checkDown(this.cursors.right, 100))
     {
-        // let y = this.player.y;
-        // let snapValue = 32;
-        // let snappedY = Math.floor(y / snapValue) * snapValue;
-        // this.player.y = snappedY + 16;
-        // this.player.setVelocityX(300);
-        // this.player.setVelocityY(0);
-        // this.player.flipX = false ; 
-        // //this.player.flipY = false;
-        // this.player.setRotation(0);
-        // console.log("right button pressed");
+      // let y = this.player.y;
+      // let snapValue = 32;
+      // let snappedY = Math.floor(y / snapValue) * snapValue;
+      // this.player.y = snappedY + 16;
+      // this.player.setVelocityX(300);
+      // this.player.setVelocityY(0);
+      // this.player.flipX = false ; 
+      // //this.player.flipY = false;
+      // this.player.setRotation(0);
+      // console.log("right button pressed");
 
         
-        this.controller.send('moving', { direction: 'right', x: this.player.x, y: this.player.y });
+      this.controller.send('moving', { direction: 'right', x: this.player.x, y: this.player.y });
     }
     else if (this.input.keyboard.checkDown(this.cursors.left, 100))
     {
         
-        // let y = this.player.y;
-        // let snapValue = 32;
+      // let y = this.player.y;
+      // let snapValue = 32;
         
-        // let snappedY = Math.floor(y / snapValue) * snapValue;
+      // let snappedY = Math.floor(y / snapValue) * snapValue;
         
-        // this.player.y = snappedY + 16;
-        // this.player.setVelocityX(-300);
-        // this.player.setVelocityY(0);
-        // this.player.flipX = true;
-        // //this.player.flipY = false;
-        // this.player.setRotation(0);
+      // this.player.y = snappedY + 16;
+      // this.player.setVelocityX(-300);
+      // this.player.setVelocityY(0);
+      // this.player.flipX = true;
+      // //this.player.flipY = false;
+      // this.player.setRotation(0);
 
-        // this.player.anims.play('moving', true);
+      // this.player.anims.play('moving', true);
 
-        this.controller.send('moving', { direction: 'left', x: this.player.x, y: this.player.y });
+      this.controller.send('moving', { direction: 'left', x: this.player.x, y: this.player.y });
     }
     else if (this.input.keyboard.checkDown(this.cursors.down, 100))
     {
-        // let x = this.player.x;
+      // let x = this.player.x;
         
-        // let snapValue = 32;
-        // let snappedX = Math.floor(x / snapValue) * snapValue;
+      // let snapValue = 32;
+      // let snappedX = Math.floor(x / snapValue) * snapValue;
         
-        // this.player.x = snappedX  + 16;
+      // this.player.x = snappedX  + 16;
         
-        // this.player.setVelocityX(0);
-        // this.player.setVelocityY(300);
-        // this.player.flipX = true;
-        // this.player.setRotation(-3.14/2);
+      // this.player.setVelocityX(0);
+      // this.player.setVelocityY(300);
+      // this.player.flipX = true;
+      // this.player.setRotation(-3.14/2);
 
-        // this.player.anims.play('moving', true);
+      // this.player.anims.play('moving', true);
 
-        this.controller.send('moving', { direction: 'down', x: this.player.x, y: this.player.y });
+      this.controller.send('moving', { direction: 'down', x: this.player.x, y: this.player.y });
     }
     else if (this.input.keyboard.checkDown(this.cursors.up, 100))
     {
-        // let x = this.player.x;
+      // let x = this.player.x;
         
-        // let snapValue = 32;
-        // let snappedX = Math.floor(x / snapValue) * snapValue;
+      // let snapValue = 32;
+      // let snappedX = Math.floor(x / snapValue) * snapValue;
         
-        // this.player.x = snappedX  + 16;
+      // this.player.x = snappedX  + 16;
         
-        // this.player.setVelocityY(-300);
-        // this.player.setVelocityX(0);
-        // this.player.flipX = true;
-        // this.player.setRotation(3.14/2);
+      // this.player.setVelocityY(-300);
+      // this.player.setVelocityX(0);
+      // this.player.flipX = true;
+      // this.player.setRotation(3.14/2);
 
-        // this.player.anims.play('moving', true);
-        this.controller.send('moving', { direction: 'up', x: this.player.x, y: this.player.y });
+      // this.player.anims.play('moving', true);
+      this.controller.send('moving', { direction: 'up', x: this.player.x, y: this.player.y });
     }
     let backendState = this.controller.state.players.get(this.controller.sessionId);
     let backendStateOther = undefined;
@@ -227,54 +227,54 @@ export class MainScene extends Phaser.Scene {
     player.x = backendState.x;
     player.y = backendState.y;
     if(backendState.direction === 'right'){
-        let y = player.y;
-        let snapValue = 32;
-        let snappedY = Math.floor(y / snapValue) * snapValue;
-        player.y = snappedY + 16;
-        player.setVelocityX(300);
-        player.setVelocityY(0);
-        player.flipX = false ; 
-        //player.flipY = false;
-        player.setRotation(0);
+      let y = player.y;
+      let snapValue = 32;
+      let snappedY = Math.floor(y / snapValue) * snapValue;
+      player.y = snappedY + 16;
+      player.setVelocityX(300);
+      player.setVelocityY(0);
+      player.flipX = false ; 
+      //player.flipY = false;
+      player.setRotation(0);
     }
     if(backendState.direction === 'left'){
-        let y = player.y;
-        let snapValue = 32;
+      let y = player.y;
+      let snapValue = 32;
         
-        let snappedY = Math.floor(y / snapValue) * snapValue;
+      let snappedY = Math.floor(y / snapValue) * snapValue;
         
-        player.y = snappedY + 16;
-        player.setVelocityX(-300);
-        player.setVelocityY(0);
-        player.flipX = true;
-        //player.flipY = false;
-        player.setRotation(0);
+      player.y = snappedY + 16;
+      player.setVelocityX(-300);
+      player.setVelocityY(0);
+      player.flipX = true;
+      //player.flipY = false;
+      player.setRotation(0);
     }
     if(backendState.direction === 'down'){
-        let x = player.x;
+      let x = player.x;
         
       let snapValue = 32;
       let snappedX = Math.floor(x / snapValue) * snapValue;
         
-        player.x = snappedX  + 16;
+      player.x = snappedX  + 16;
         
-        player.setVelocityX(0);
-        player.setVelocityY(300);
-        player.flipX = true;
-        player.setRotation(-3.14/2);
+      player.setVelocityX(0);
+      player.setVelocityY(300);
+      player.flipX = true;
+      player.setRotation(-3.14/2);
     }
     if(backendState.direction === 'up'){
-        let x = player.x;
+      let x = player.x;
         
-        let snapValue = 32;
-        let snappedX = Math.floor(x / snapValue) * snapValue;
+      let snapValue = 32;
+      let snappedX = Math.floor(x / snapValue) * snapValue;
         
-        player.x = snappedX  + 16;
+      player.x = snappedX  + 16;
         
-        player.setVelocityY(-300);
-        player.setVelocityX(0);
-        player.flipX = true;
-        player.setRotation(3.14/2);
+      player.setVelocityY(-300);
+      player.setVelocityX(0);
+      player.flipX = true;
+      player.setRotation(3.14/2);
     }
   }
 }

@@ -29,7 +29,7 @@ const Room = () => {
   }, []);
 
   function ready() {
-    room.send("PLAYER_READY");
+    room.send('PLAYER_READY');
   }
 
   return (
