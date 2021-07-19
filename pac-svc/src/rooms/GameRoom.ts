@@ -15,8 +15,15 @@ class GameRoom extends Room<GameState> {
 		});
 
 		this.onMessage('YO', () => {
-			console.log("YO RECEIVED")
-		})
+			console.log("YO RECEIVED");
+		});
+
+		this.onMessage('moving', (client, message) => {
+			const player = this.state.players.get(client.id);
+			player.direction = message?.direction;
+			player.x = message?.x;
+			player.y = message?.y;
+		});
 	}
 	
 	onJoin(client: Client) {
