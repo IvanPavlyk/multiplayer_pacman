@@ -1,4 +1,4 @@
-import { type, Schema } from '@colyseus/schema';
+import { type, Schema } from "@colyseus/schema";
 
 class Player extends Schema {
 	@type('boolean') ready = false;
@@ -6,9 +6,9 @@ class Player extends Schema {
 	@type('number') x =  Math.floor(Math.random() * 300) + 50;
 	@type('number') y = Math.floor(Math.random() * 300) + 50;
 
-	constructor() {
-		super();
-	}
+  constructor() {
+    super();
+  }
 }
 
 export default Player;

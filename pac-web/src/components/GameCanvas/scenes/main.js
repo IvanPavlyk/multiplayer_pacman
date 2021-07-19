@@ -1,22 +1,22 @@
-import Phaser from "phaser";
+import Phaser from 'phaser';
 
 
 export class MainScene extends Phaser.Scene {
   preload() {
-    console.log(this.registry.get('controller'));
+    console.log(this.registry.get("controller"));
 
-    this.load.image("tiles", "/chompermazetiles.png");
+    this.load.image('tiles', '/chompermazetiles.png');
     this.load.spritesheet('pacman', 
-        '/pacman.png',
-        { frameWidth: 16, frameHeight: 16 }
+      '/pacman.png',
+      { frameWidth: 16, frameHeight: 16 }
     );
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // var json = require("../level/map.json");
-    var json2 = require("../level/map2.json");
+    var json2 = require('../level/map2.json');
 
     // this.load.tilemapTiledJSON("tilemap", json);
-    this.load.tilemapTiledJSON("tilemap2", json2);
+    this.load.tilemapTiledJSON('tilemap2', json2);
   }
 
   create() {
@@ -29,10 +29,10 @@ export class MainScene extends Phaser.Scene {
    
 
     // let map = this.make.tilemap({ key: "tilemap" });
-    let map2 = this.make.tilemap({ key: "tilemap2" });
+    let map2 = this.make.tilemap({ key: 'tilemap2' });
 
     // const tileset = map.addTilesetImage("level_one", "tiles");
-    const tileset2 = map2.addTilesetImage("chompermazetiles", "tiles");
+    const tileset2 = map2.addTilesetImage('chompermazetiles', 'tiles');
 
     // this.BaseLayer = map.createLayer("Base", tileset);
     // this.PelletsLayer = map.createLayer("Pellets", tileset);
@@ -73,10 +73,10 @@ export class MainScene extends Phaser.Scene {
     // this.physics.add.overlap(this.otherPlayer, this.PelletsLayer, collectPelletOther, null, this);
 
     this.anims.create({
-      key: 'moving',
-      frames: this.anims.generateFrameNumbers('pacman', { start: 0, end: 2 }),
+      key: "moving",
+      frames: this.anims.generateFrameNumbers("pacman", { start: 0, end: 2 }),
       frameRate: 10,
-      repeat: -1
+      repeat: -1,
     });
     this.player.setScale(2);
     this.otherPlayer.setScale(2);
@@ -105,13 +105,12 @@ export class MainScene extends Phaser.Scene {
       }
       //pellet.disableBody(true, true);
       //pellet.destroy();
-    };
+    }
   }
 
-  
   update() {
     this.counter = (this.counter + 1)%100;
-    let sessionId = this.controller.sessionId;
+    // let sessionId = this.controller.sessionId;
     //console.log(sessionId);
 
     if (this.input.keyboard.checkDown(this.cursors.right, 100))
@@ -254,8 +253,8 @@ export class MainScene extends Phaser.Scene {
     if(backendState.direction === 'down'){
         let x = player.x;
         
-        let snapValue = 32;
-        let snappedX = Math.floor(x / snapValue) * snapValue;
+      let snapValue = 32;
+      let snappedX = Math.floor(x / snapValue) * snapValue;
         
         player.x = snappedX  + 16;
         

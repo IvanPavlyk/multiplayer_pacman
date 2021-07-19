@@ -1,6 +1,6 @@
-import { Room, Delayed, Client } from 'colyseus';
-import Player from '../schema/entities/Player';
-import GameState from '../schema/GameState';
+import { Room, Delayed, Client } from "colyseus";
+import Player from "../schema/entities/Player";
+import GameState from "../schema/GameState";
 
 class GameRoom extends Room<GameState> {
 	maxClients = 6;
