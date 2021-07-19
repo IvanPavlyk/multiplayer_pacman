@@ -1,1 +1,1 @@
-export { default } from './GameCanvas'
+export { default } from './GameCanvas';
