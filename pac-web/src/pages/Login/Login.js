@@ -2,7 +2,6 @@ import React from 'react';
 import { Form, Button, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { GoogleLogin } from 'react-google-login';
-import './style.css';
 
 const Login = () => {
   const history = useHistory();

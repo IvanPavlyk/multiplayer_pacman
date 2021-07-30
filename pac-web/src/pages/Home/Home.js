@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useColyseus } from 'components/ColyseusClient';
 import { useHistory } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 const Room = () => {
   const [id, setValue] = useState('');
@@ -17,12 +17,16 @@ const Room = () => {
     history.push(`/room/${id}`);
   };
 
+  const redirectLogin = () => {
+    history.push('/login');
+  };
+
   return (
     <div>
-      <Link to='/login'>To Login</Link>
+      <Button onClick={redirectLogin}>Login</Button>
 
       <br />
-      <button onClick={createAndJoinRoom}>Create room</button>
+      <Button onClick={createAndJoinRoom}>Create room</Button>
       <br />
 
       <input
@@ -30,7 +34,7 @@ const Room = () => {
         value={id}
         onChange={(e) => setValue(e.target.value)}
       />
-      <button onClick={() => joinRoom(id)}>Join by id</button>
+      <Button onClick={() => joinRoom(id)}>Join by id</Button>
     </div>
   );
 };
