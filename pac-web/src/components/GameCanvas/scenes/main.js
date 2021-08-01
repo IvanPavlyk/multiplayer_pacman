@@ -13,7 +13,7 @@ export class MainScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // var json = require("../level/map.json");
-    var json2 = require('../level/map2.json');
+    var json2 = require("../level/map3.json");
 
     // this.load.tilemapTiledJSON("tilemap", json);
     this.load.tilemapTiledJSON('tilemap2', json2);
@@ -57,7 +57,7 @@ export class MainScene extends Phaser.Scene {
     }))});
     console.log(this.controller.state);
     this.BaseLayer.setCollisionByExclusion([-1]); 
-    this.player = this.physics.add.sprite(42, 42, 'pacman');
+    this.player = this.physics.add.sprite(48, 48, 'pacman');
     this.otherPlayer = this.physics.add.sprite(-100, -100, 'pacman');
     this.player.setCollideWorldBounds(true);
     this.otherPlayer.setCollideWorldBounds(true);
