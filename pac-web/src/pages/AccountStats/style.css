@@ -1,0 +1,21 @@
+.account-stats-accordian {
+    margin-top: 1.5rem;
+}
+
+.card-body {
+    padding: 0 !important;
+}
+
+.card-header {
+    background-color: #343a40 !important;
+}
+
+.card {
+    border: 0 !important;
+    background-color: transparent !important;
+}
+
+.btn-link {
+    color: white !important;
+    font-size: 125% !important;
+}

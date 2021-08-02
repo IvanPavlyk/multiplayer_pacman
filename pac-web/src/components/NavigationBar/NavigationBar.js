@@ -20,6 +20,10 @@ const NavigationBar = (props) => {
     history.push(`/room/${id}`);
   };
 
+  const pushNavigationPage = (selectedKey) => {
+    history.push(selectedKey);
+  };
+
   return( <div>
     <Navbar bg='dark'>
       <Container>
@@ -33,10 +37,12 @@ const NavigationBar = (props) => {
           />{' '}
           <span className='navigation-text'>PAC MAN</span>
         </Navbar.Brand>
-        <Nav>
+        <Nav
+          onSelect={pushNavigationPage}
+        >
           <Nav.Link className='navigation-text'>Global Stats</Nav.Link>
-          <Nav.Link className='navigation-text'>My Stats</Nav.Link>
-          <Nav.Link className='navigation-text'>My Account</Nav.Link>
+          <Nav.Link eventKey='/stats/account'className='navigation-text'>My Stats</Nav.Link>
+          <Nav.Link eventKey='/account' className='navigation-text'>My Account</Nav.Link>
         </Nav>
         <Button className='mr-2' onClick={createAndJoinRoom} variant='outline-success'>Create Game</Button>
         <Form className='d-flex'>
@@ -46,7 +52,7 @@ const NavigationBar = (props) => {
             value={id}
             onChange={(e) => setValue(e.target.value)}
           />
-          <Button onClick={() => joinRoom(id)}>Join by id</Button>
+          <Button variant='secondary' onClick={() => joinRoom(id)}>Join by id</Button>
         </Form>
       </Container>
     </Navbar>

@@ -1,5 +1,24 @@
+body {
+  font-family: 'VT323', monospace;
+  font-size: 125%;
+}
+
 .App {
-  width: 100%;
-  max-width: 1000px;
-  margin: auto;
+  height: 100rem;
+}
+
+.background {
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.btn-primary {
+  background-color: #FFD700;
+  border-color: #FFD700;
+}
+
+.btn-primary:hover {
+  background-color: #ffe600;
+  border-color: #ffe600;
 }

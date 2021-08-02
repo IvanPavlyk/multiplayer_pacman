@@ -23,7 +23,7 @@ const Room = () => {
 
   return (
     <div>
-      <Button onClick={redirectLogin}>Login</Button>
+      <Button className='.btn-yellow' onClick={redirectLogin}>Login</Button>
 
       <br />
       <Button onClick={createAndJoinRoom}>Create room</Button>
