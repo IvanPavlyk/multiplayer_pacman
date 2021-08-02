@@ -12,18 +12,18 @@ const Room = () => {
 
   useEffect(() => {
     (async () => {
-      const room = (window.room) || await client.joinRoomById(id);
+      const room = window.room || (await client.joinRoomById(id));
       if (room == null) return history.push('/');
       window.room = room;
       setRoom(room);
-  
+
       room.onStateChange((newState) => {
         setState({
           ...state,
-          ...newState
+          ...newState,
         });
       });
-  
+
       room.send('PLAYER_READY', { ready: false });
     })();
   }, []);
@@ -38,6 +38,7 @@ const Room = () => {
 
       <p>Players in room ({state?.players?.size})</p>
       <p>{JSON.stringify(state?.players)}</p>
+      <p>{JSON.stringify(state?.ghosts)}</p>
 
       <button onClick={ready}>Ready</button>
     </div>
