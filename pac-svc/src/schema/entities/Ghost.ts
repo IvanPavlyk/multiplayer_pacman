@@ -1,7 +1,6 @@
 import { type, Schema } from '@colyseus/schema';
 
-class Player extends Schema {
-  @type('boolean') ready = false;
+class Ghost extends Schema {
   @type('string') direction = 'right';
   @type('string') queuedDirection = 'right';
   @type('number') x = 0;
@@ -14,4 +13,4 @@ class Player extends Schema {
   }
 }
 
-export default Player;
+export default Ghost;
