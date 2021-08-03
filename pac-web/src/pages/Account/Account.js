@@ -1,9 +1,10 @@
 import React from 'react';
+import Container from 'react-bootstrap/Container';
 import './style.css';
 
 const Account = () => {
   return(
-    <div className = 'container'>
+    <Container>
       <table className='table table-striped account-table'>
         <thead className='thead-dark'>
           <th scope='col'>PROFILE</th>
@@ -24,7 +25,7 @@ const Account = () => {
           </tr>
         </tbody>
       </table>
-    </div>);
+    </Container>);
 
 };
 

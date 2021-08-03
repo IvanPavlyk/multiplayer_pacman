@@ -19,11 +19,11 @@ const NavigationBar = ( {children} ) => {
   };
 
   const getNavigationBar = () => {
-    if(location.pathname !== '/login') {
+    if(location.pathname !== '/') {
       return (<div>
         <Navbar bg='dark'>
           <Container>
-            <Navbar.Brand href='/'>
+            <Navbar.Brand href='/home'>
               <img
                 alt=''
                 src='/logo192.png'

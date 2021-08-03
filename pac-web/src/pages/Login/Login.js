@@ -1,41 +1,35 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { Form, Button, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { GoogleLogin } from 'react-google-login';
 
 const Login = () => {
   const history = useHistory();
+  const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'; //TODO: move to enviornment variable
 
-  const handleLogin = (response) => {
+  const onLoginSuccess = (response) => {
     console.log(response);
-    history.push('/'); //TODO: push to create account page
+    history.push('/home'); //TODO: push to create account page
+    
+  };
+
+  const onLoginFailure = (response) => {
+    alert('Error while logging in.' + response);
   };
 
   return (
     <Container>
       <Row className='justify-content-center'>
-        <Form>
-          <Form.Group controlId='formBasicEmail'>
-            <Form.Label>Email address</Form.Label>
-            <Form.Control type='email' placeholder='Enter email' />
-          </Form.Group>
-          <Form.Group controlId='formBasicPassword'>
-            <Form.Label>Password</Form.Label>
-            <Form.Control type='password' placeholder='Password' />
-          </Form.Group>
-          <Button variant='primary' type='submit'>
-                        Submit
-          </Button>
-        </Form>
+        <img src='/logo512.png'></img>
       </Row>
       <Row className='justify-content-center'>
         <GoogleLogin 
-          clientId={
-            '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'
-          }
+          clientId={clientId}
           buttonText='Log in with Google'
-          onSuccess={handleLogin}
-          onFailure={handleLogin}
+          onSuccess={onLoginSuccess}
+          onFailure={onLoginFailure}
+          isSignedIn={true}
           cookiePolicy={'single_host_origin'}
         />
       </Row>
