@@ -22,7 +22,8 @@ const pool = new Pool({
 
 app.post('/add-user', async (req, res) => {
   const { name, email } = req.body;
-  const template = 'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
+  const template =
+    'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
 
   let response;
   try {
@@ -44,3 +45,23 @@ const gameServer = new Server({
 
 gameServer.define('game-room', GameRoom);
 gameServer.listen(port);
+
+app.post('/updateGlobalStats', async (req, res) => {
+  const { pelletsEaten, ghostsEaten, playersEaten } = req.body;
+  
+  const query = `UPDATE pacman."GlobalStats" 
+          SET pelletsEaten = pelletsEaten + $1,
+              gamesPlayed = gamesPlayed + 1,
+              ghostsEaten = ghostsEaten + $2,
+              playersEaten = playersEaten + $3 
+    `;
+  const values = [pelletsEaten, ghostsEaten, playersEaten];
+  
+  try {
+    const response = await pool.query(query, values);
+    res.send(response);
+  } catch (err) {
+    res.status(400).send({ error: 'request failed' });
+    console.error(err.stack);
+  }
+});
