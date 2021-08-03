@@ -14,6 +14,7 @@ const Room = () => {
   };
 
   const joinRoom = (id) => {
+    console.log(id);
     history.push(`/room/${id}`);
   };
 

@@ -7,6 +7,7 @@ import Room from 'pages/Room';
 import Account from 'pages/Account';
 import AccountStats from 'pages/AccountStats';
 import NavigationBar from 'components/NavigationBar';
+import GlobalStats from 'pages/GlobalStats';
 
 const Router = () => {
   return (
@@ -18,6 +19,7 @@ const Router = () => {
           <Route path='/room/:id' component={Room}/>
           <Route path='/account' component={Account}/>
           <Route path='/stats/account' component={AccountStats}/>
+          <Route path='/stats/global' component={GlobalStats}/>
           <Redirect to='/login'/>
         </Switch>
       </NavigationBar>

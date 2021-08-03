@@ -5,7 +5,6 @@ import ColyseusClient from 'components/ColyseusClient';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
-// import  shatteredBackground from '../images/background.png';
 
 function App() {
   return (

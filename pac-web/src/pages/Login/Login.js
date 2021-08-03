@@ -8,7 +8,7 @@ const Login = () => {
 
   const handleLogin = (response) => {
     console.log(response);
-    history.push('/room'); //TODO: push to create account page
+    history.push('/'); //TODO: push to create account page
   };
 
   return (
@@ -27,7 +27,9 @@ const Login = () => {
                         Submit
           </Button>
         </Form>
-        <GoogleLogin
+      </Row>
+      <Row className='justify-content-center'>
+        <GoogleLogin 
           clientId={
             '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'
           }
