@@ -1,6 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import axios from 'axios';
-// eslint-disable-next-line no-unused-vars
 import { Form, Button, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { GoogleLogin } from 'react-google-login';
@@ -15,16 +15,31 @@ const Login = () => {
       name: profile.name,
       email: profile.email
     };
+    console.log(user);
 
-    axios.post('http://localhost:3002/add-user', user) //TODO: push url to enviornment variable or helper function
-      .then( res => {
+    // axios.post('http://localhost:3002/add-user', user) //TODO: push url to enviornment variable or helper function
+    //   .then( res => {
+    //     console.log(res);
+    //     history.push('/home'); //TODO: push to create account page
+    //   })
+    //   .catch ( error => {
+    //     console.error(error);
+    //   });
+
+    //TODO: check if user already has a profile else push to add user
+    axios.post('http://localhost:3002/auth/user-exists', user)
+      .then (res => {
         console.log(res);
-        history.push('/home'); //TODO: push to create account page
+        if(res.data.rows.length === 1) {
+          console.log('account exists');
+          history.push('/home');
+        } else {
+          history.push('/account/new-account');
+        }
       })
-      .catch ( error => {
+      .catch (error => {
         console.error(error);
       });
-
   };
 
   const onLoginFailure = (response) => {

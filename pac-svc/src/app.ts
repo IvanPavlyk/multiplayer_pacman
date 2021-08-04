@@ -20,19 +20,38 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
-app.post("/add-user", async (req, res) => {
+app.post('/add-user', async (req, res) => {
     const { name, email } = req.body;
     const template = `INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)`;
-    
+
     let response;
     try {
         response = await pool.query(template, [uuidv4(), name, email]);
-    } catch (error){
+    } catch (error) {
         response = error;
     }
-
     res.send(response);
 });
+
+//Will return an empty array if the user does not exist
+app.post('/auth/user-exists', async (req, res) => {
+    console.log(req.body);
+    
+    const { email } = req.body;
+    const template = `SELECT * FROM pacman."User" WHERE email= ($1)`;
+    let response;
+    try {
+        response = await pool.query(template, [email]);
+    } catch (error) {
+        response = error;    
+    }
+    res.send(response);
+})
+
+app.get('/auth/user-is-authenticated', (req, res) => {
+    console.log(req);
+    res.send("Received");
+})
 
 app.listen(app.get("port"), () => {
     console.log(`Server at: http://localhost:${app.get("port")}/`);

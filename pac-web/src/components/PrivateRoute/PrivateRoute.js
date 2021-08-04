@@ -1,18 +1,10 @@
+/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { Redirect, Route } from 'react-router-dom';
 
-const PrivateRoute = () => {
+const PrivateRoute = ( {component: Component, ...rest} ) => {
   const [isAuthenticated, setAuthenticated] = useState(false);
-  const history = useHistory();
-
-  const getPageIfAuthenticated = (isAuthenticated) => {
-    if(isAuthenticated){
-      //   return pushed route
-    } else {
-      //   return login page
-    }
-  };
 
   useEffect(() => {
     axios.get('/auth/isauthenticated').then(({data: {userIsAuthenticated}}) => {
@@ -21,7 +13,15 @@ const PrivateRoute = () => {
       }
     });
   });
-    
+
+  return (
+    <Route
+      {...rest}
+      render={(props) =>
+        isAuthenticated ? <Component {...props} /> : <Redirect to='/' />
+      }
+    />
+  );
 };
 
 export default PrivateRoute;
