@@ -6,8 +6,8 @@ import Ghost from '../schema/Ghost';
 class GameRoom extends Room<GameState> {
   maxClients = 4;
 
-  isAdmin(client: Client): boolean {
-    return this.state.adminId === client.id;
+  isAdmin(id: string): boolean {
+    return this.state.adminId === id;
   }
 
   startGame(): void {
@@ -31,20 +31,18 @@ class GameRoom extends Room<GameState> {
       player.ready = message?.ready ?? !player.ready;
 
       // check if game can start (all players are ready)
-      const players = Array.from(this.state.players.values());
-
       let playersReady = 0;
-      for (const player of players) {
-        if (!this.isAdmin(player.client)) {
+      this.state.players.forEach((player, key) => {
+        if (!this.isAdmin(key)) {
           if (player.ready) playersReady++;
         }
-      }
+      });
 
-      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
+      this.state.gameCanStart = this.state.players.size > 1 && playersReady >= this.state.players.size - 1;
     });
 
     this.onMessage('START_GAME', (client) => {
-      if (this.state.gameCanStart && this.isAdmin(client)) {
+      if (this.state.gameCanStart && this.isAdmin(client.id)) {
         this.startGame();
       }
     });
@@ -187,7 +185,7 @@ class GameRoom extends Room<GameState> {
   }
 
   onJoin(client: Client): void {
-    this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
+    this.state.players.set(client.id, new Player({ id: 0, x: 32 * 5 + 16, y: 32 * 10 + 16 }));
 
     if (this.state.players.size === 1) {
       this.state.adminId = client.id;
@@ -196,9 +194,12 @@ class GameRoom extends Room<GameState> {
 
   async onLeave(client: Client): Promise<void> {
     const player = this.state.players.get(client.id);
+    const ghost = this.state.ghosts.get(client.id);
     const prevAdminId = this.state.adminId;
     this.state.players.delete(client.id);
-    this.state.ghosts.delete(client.id);
+    if (this.state.ghosts.get(client.id)) {
+      this.state.ghosts.delete(client.id);
+    }
 
     // assign a random player admin if admin leaves
     if (prevAdminId === client.id) {
@@ -210,6 +211,9 @@ class GameRoom extends Room<GameState> {
       // allow disconnected client to reconnect into this room until 10 seconds
       await this.allowReconnection(client, 10);
       this.state.players.set(client.id, player);
+      if (ghost) {
+        this.state.ghosts.set(client.id, ghost);
+      }
 
       // reinstate admin previleges
       if (prevAdminId === client.id) {

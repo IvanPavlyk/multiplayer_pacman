@@ -14,6 +14,7 @@ const Room = () => {
   const [room, setRoom] = useState(null);
   const [gameInstance, setGameInstance] = useState(null);
   const [roomState, setRoomState] = useState({});
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -36,6 +37,24 @@ const Room = () => {
       room.send('PLAYER_READY', { ready });
     })();
   }, []);
+
+  useEffect(() => {
+    let temp = [];
+    if (roomState && roomState.players) {
+      roomState.players.forEach((player, key) => {
+        console.log(player, key);
+        temp.push(
+          <Card className='player-card' key={`player-${player.id}`}>
+            <Card.Body>
+              <Card.Title>Player {player.id + 1}</Card.Title>
+              {isRoomAdmin(key) ? <Badge>HOST</Badge> : <Badge>{player.ready ? 'Ready!' : 'Not Ready'}</Badge>}
+            </Card.Body>
+          </Card>
+        );
+      });
+      setCards([...temp]);
+    }
+  }, [roomState]);
 
   function isRoomAdmin(id) {
     id = id || room?.sessionId;
@@ -62,17 +81,7 @@ const Room = () => {
         <p style={{ width: '760px' }}>{JSON.stringify(roomState?.players)}</p>
         <p style={{ width: '760px' }}>{JSON.stringify(roomState?.ghosts)}</p>
 
-        <div className='player-list'>
-          {Array.from(roomState?.players?.values?.() || []).map((player, i) => (
-            <Card className='player-card' key={`player-${i}`}>
-              <Card.Body>
-                <Card.Title>Player {i + 1}</Card.Title>
-
-                {isRoomAdmin(player.id) ? <Badge>HOST</Badge> : <Badge>{player.ready ? 'Ready!' : 'Not Ready'}</Badge>}
-              </Card.Body>
-            </Card>
-          ))}
-        </div>
+        <div className='player-list'>{cards}</div>
 
         <div className='lobby__buttons'>
           {isRoomAdmin() ? (
