@@ -6,6 +6,8 @@ class Player extends Schema {
   @type('string') queuedDirection = 'right';
   @type('number') x = 0;
   @type('number') y = 0;
+  @type('number') velocity = 3;
+  @type('number') pelletsEaten = 0;
 
   constructor({ x, y }: { x: number; y: number }) {
     super();
