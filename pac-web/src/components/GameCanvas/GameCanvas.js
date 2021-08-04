@@ -5,8 +5,8 @@ import { MainScene } from './scenes/main';
 
 const GameCanvas = React.memo(({ controller, ...rest }) => {
   return <IonPhaser game={{
-    width: 800,
-    height: 800,
+    width: 736,
+    height: 704,
     type: Phaser.AUTO,
     scene: MainScene,
     pixelArt: true,

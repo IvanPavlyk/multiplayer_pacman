@@ -17,11 +17,11 @@ const Room = () => {
 
   useEffect(() => {
     (async () => {
-      const room = (window.room) || await client.joinRoomById(id);
+      const room = window.room || (await client.joinRoomById(id));
       if (room == null) return history.push('/');
       window.room = room;
       setRoom(room);
-  
+
       room.onStateChange((newState) => {
         setRoomState({
           ...roomState,
@@ -59,7 +59,8 @@ const Room = () => {
       {/* LOBBY */}
       <div className='lobby'>
         <p>Players in room ({roomState?.players?.size})</p>
-        {/* <p>{JSON.stringify(state?.players)}</p> */}
+        <p>{JSON.stringify(roomState?.players)}</p>
+        <p>{JSON.stringify(roomState?.ghosts)}</p>
 
         <div className='player-list'>
           {Array.from(roomState?.players?.values?.() || []).map((player, i) => (
