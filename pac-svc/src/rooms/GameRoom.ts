@@ -7,8 +7,8 @@ class GameRoom extends Room<GameState> {
   maxClients = 4;
   messageTimeouts = {};
 
-  isAdmin(id: string): boolean {
-    return this.state.adminId === id;
+  isAdmin(client: Client): boolean {
+    return this.state.adminId === client.id;
   }
 
   startGame(): void {
@@ -22,6 +22,7 @@ class GameRoom extends Room<GameState> {
     function mod(n, m) {
       return ((n % m) + m) % m;
     }
+    const tints = [0xffff00, 0xff0000, 0x00ff00, 0x0000ff];
     this.setState(new GameState());
     const playerCallbacks = {};
     const ghostCallbacks = {};
@@ -32,14 +33,15 @@ class GameRoom extends Room<GameState> {
       player.ready = message?.ready ?? !player.ready;
 
       // check if game can start (all players are ready)
+      const players = Array.from(this.state.players.values());
       let playersReady = 0;
-      this.state.players.forEach((player, key) => {
-        if (!this.isAdmin(key)) {
+      for (const player of players) {
+        if (!this.isAdmin(player.client)) {
           if (player.ready) playersReady++;
         }
-      });
+      }
 
-      this.state.gameCanStart = this.state.players.size > 1 && playersReady >= this.state.players.size - 1;
+      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
     });
 
     this.onMessage('SEND_CHAT_MESSAGE', (client, message) => {
@@ -56,9 +58,14 @@ class GameRoom extends Room<GameState> {
 
     this.onMessage('START_GAME', (client) => {
       if (!this.state.gameCanStart || this.state.gameStarted) return;
-      if (this.isAdmin(client.id)) {
+      if (this.isAdmin(client)) {
         this.startGame();
       }
+    });
+
+    this.onMessage('CHANGE_COLOR', (client) => {
+      const player = this.state.players.get(client.id);
+      player.tint = tints[(tints.indexOf(player.tint) + 1) % tints.length];
     });
 
     /* game event listeners */
@@ -199,7 +206,7 @@ class GameRoom extends Room<GameState> {
   }
 
   onJoin(client: Client): void {
-    this.state.players.set(client.id, new Player({ id: 0, x: 32 * 5 + 16, y: 32 * 10 + 16 }));
+    this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
 
     if (this.state.players.size === 1) {
       this.state.adminId = client.id;

@@ -9,21 +9,16 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "plugins": ["react"],
-    "rules": {
-      "semi": ["warn", "always"],
-      "quotes": ["warn", "single"],
-      "jsx-quotes": ["warn", "prefer-single"],
-      "indent": ["warn", 2],
-      "react/prop-types": "off",
-      "no-unused-vars": "warn"
-    }
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react"],
+  "rules": {
+    "semi": ["warn", "always"],
+    "quotes": ["warn", "single"],
+    "jsx-quotes": ["warn", "prefer-single"],
+    "indent": ["warn", 2],
+    "react/prop-types": "off",
+    "no-unused-vars": "warn"
   }
 }

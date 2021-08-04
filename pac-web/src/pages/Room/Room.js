@@ -64,6 +64,9 @@ const Room = () => {
     });
     setChatMessage('');
   }
+  function changeColor() {
+    room.send('CHANGE_COLOR');
+  }
 
   // get list of players
   const players = Array.from(roomState?.players?.values?.() || []);
@@ -71,6 +74,14 @@ const Room = () => {
   for (let i = 0; i < 4 - length; i++) {
     players.push(null);
   }
+
+  const tint = {
+    16776960: 'pacman-yellow',
+    0xff0000: 'pacman-red',
+    0x00ff00: 'pacman-green',
+    0x0000ff: 'pacman-blue',
+  };
+  console.log(players);
 
   return (
     <Container className='room'>
@@ -135,8 +146,9 @@ const Room = () => {
                 <div
                   className={`player-card ${player.id === room?.sessionId && 'player-card--is-player'}`}
                   key={`p-${i}`}
+                  onClick={player.id === room?.sessionId ? changeColor : null}
                 >
-                  <img style={{ margin: '1.4rem 0 0.6rem' }} src={player_pacman} />
+                  <img style={{ margin: '1.4rem 0 0.6rem' }} src={player_pacman} className={tint[player.tint]} />
 
                   <div style={{ position: 'relative' }}>
                     {chatMessage && <Tooltip placement='top'>{chatMessage}</Tooltip>}
