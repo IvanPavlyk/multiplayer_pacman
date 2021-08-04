@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import { IonPhaser } from '@ion-phaser/react';
 import { MainScene } from './scenes/main';
 
-const GameCanvas = React.memo(({ controller }) => {
+const GameCanvas = React.memo(({ controller, ...rest }) => {
   return <IonPhaser game={{
     width: 736,
     height: 704,
@@ -24,8 +24,7 @@ const GameCanvas = React.memo(({ controller }) => {
         game.registry.merge({ controller });
       }
     }
-  }
-  }/>;
+  }} {...rest}/>;
 });
 
 GameCanvas.displayName = 'GameCanvas';

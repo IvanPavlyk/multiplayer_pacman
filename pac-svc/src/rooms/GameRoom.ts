@@ -1,12 +1,22 @@
-import { Room, Delayed, Client } from 'colyseus';
-import Ghost from '../schema/entities/Ghost';
-import Player from '../schema/entities/Player';
+import { Room, Client } from 'colyseus';
 import GameState from '../schema/GameState';
+import Player from '../schema/Player';
+import Ghost from '../schema/Ghost';
 
 class GameRoom extends Room<GameState> {
   maxClients = 4;
-  
-  onCreate(options) {
+
+  isAdmin(client: Client): boolean {
+    return (this.state.adminId === client.id);
+  }
+
+  startGame(): void {
+    this.state.gameStarted = true;
+    this.broadcast('GAME_START');
+    this.lock();
+  }
+
+  onCreate(): void {
     const pacmanBaseVelocity = 3;
     function mod(n, m) {
       return ((n % m) + m) % m;
@@ -15,14 +25,34 @@ class GameRoom extends Room<GameState> {
     var playerCallbacks = {};
     var ghostCallbacks = {};
 
-    /* event listeners */
+    /* lobby event listeners */
     this.onMessage('PLAYER_READY', (client, message) => {
       const player = this.state.players.get(client.id);
       player.ready = message?.ready ?? !player.ready;
+
+      // check if game can start (all players are ready)
+      const players = Array.from(this.state.players.values());
+      
+      let playersReady = 0;
+      for (const player of players) {
+        if (!this.isAdmin(player.client)) {
+          if (player.ready) playersReady++;
+        }
+      }
+
+      this.state.gameCanStart = (players.length > 1 && playersReady >= players.length-1);
     });
 
+    this.onMessage('START_GAME', (client) => {
+      if (this.state.gameCanStart && this.isAdmin(client)) {
+        this.startGame();
+      }
+    });
+
+    /* game event listeners */
     this.onMessage('initMap', (client, message) => {
       const player = this.state.players.get(client.id);
+
       this.state.counter += 1;
       if (!this.state.pellets.length) {
         message.pellets.forEach((ele) => {
@@ -145,22 +175,39 @@ class GameRoom extends Room<GameState> {
     });
   }
 
-  onJoin(client: Client) {
-    this.state.players.set(client.id, new Player({ x: 32 * 5 + 16, y: 32 * 10 + 16 }));
-  }
+  onJoin(client: Client): void {
+    this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
 
-  async onLeave(client: Client) {
+    if (this.state.players.size === 1) {
+      this.state.adminId = client.id;
+    }
+  }
+  
+  async onLeave(client: Client): Promise<void> {
     const player = this.state.players.get(client.id);
+    const prevAdminId = this.state.adminId;
     this.state.players.delete(client.id);
 
+    // assign a random player admin if admin leaves
+    if (prevAdminId === client.id) {
+      const playerIds = Array.from(this.state.players.keys());
+      this.state.adminId = playerIds.shift();
+    }
+    
     try {
-      // allow disconnected client to reconnect into this room until 20 seconds
-      await this.allowReconnection(client, 20);
+      // allow disconnected client to reconnect into this room until 10 seconds
+      await this.allowReconnection(client, 10);
       this.state.players.set(client.id, player);
-    } catch (err) {}
-  }
 
-  onDispose() {}
+      // reinstate admin previleges
+      if (prevAdminId === client.id) {
+        this.state.adminId = client.id;
+      }
+
+    } catch(err) {
+      console.log(err);
+    }
+  }
 }
 
 export default GameRoom;
