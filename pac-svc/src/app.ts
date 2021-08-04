@@ -46,7 +46,7 @@ const gameServer = new Server({
 gameServer.define('game-room', GameRoom);
 gameServer.listen(port);
 
-app.post('/updateGlobalStats', async (req, res) => {
+app.put('/globalStats', async (req, res) => {
   const { pelletsEaten, ghostsEaten, playersEaten } = req.body;
   
   const query = `UPDATE pacman."GlobalStats" 
@@ -65,3 +65,17 @@ app.post('/updateGlobalStats', async (req, res) => {
     console.error(err.stack);
   }
 });
+
+app.get('/globalStats', async (req, res) => {
+  const query = 'SELECT * FROM pacman."GlobalStats"';
+
+  try {
+    const response = await pool.query(query);
+
+    res.send(response.rows);
+  } catch (error) {
+    console.error(error.stack);
+    res.status(404).send({ error: 'Not found' });
+  }
+});
+
