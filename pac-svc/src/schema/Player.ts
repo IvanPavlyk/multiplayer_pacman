@@ -1,3 +1,4 @@
+import { Client } from 'colyseus';
 import { type, Schema } from '@colyseus/schema';
 
 class Player extends Schema {
@@ -7,8 +8,15 @@ class Player extends Schema {
   @type('number') x = 0;
   @type('number') y = 0;
 
-  constructor({ x, y }: { x: number; y: number }) {
+  @type('string') id = null;
+  
+  client: Client = null;
+
+  constructor(client, { x, y }: { x: number; y: number }) {
     super();
+    this.id = client.id;
+    this.client = client;
+    
     this.x = x;
     this.y = y;
   }
