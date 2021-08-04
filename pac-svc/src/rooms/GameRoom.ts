@@ -13,8 +13,13 @@ class GameRoom extends Room<GameState> {
 
   startGame(): void {
     this.state.gameStarted = true;
+    this.broadcastGameAlert('Get ready! In 3...');
     this.broadcast('GAME_START');
     this.lock();
+  }
+
+  broadcastGameAlert(message: string) {
+    this.state.gameAlertMessage = message;
   }
 
   onCreate(): void {

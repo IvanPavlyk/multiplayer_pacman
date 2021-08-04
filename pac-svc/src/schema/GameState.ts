@@ -1,7 +1,6 @@
 import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 import Player from './Player';
 import Ghost from './Ghost';
-import Message from './Message';
 
 class GameState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
@@ -10,6 +9,7 @@ class GameState extends Schema {
 
   @type('boolean') gameCanStart = false;
   @type('boolean') gameStarted = false;
+  @type('string') gameAlertMessage = 'dasdada';
   @type('string') adminId = null;
 
   @type(['number']) pellets = new ArraySchema<number>();

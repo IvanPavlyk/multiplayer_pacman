@@ -75,9 +75,9 @@ const Room = () => {
   return (
     <Container className='room'>
       {/* GAME */}
-      <div className={`game ${(!room?.state?.gameStarted) && 'hidden'}`}>
+      <div className={`game ${(!roomState?.gameStarted) && 'hidden'}`}>
         <div className='game__alert'>
-          Get ready!
+          {roomState?.gameAlertMessage}
         </div>
 
         {gameInstance}
@@ -104,7 +104,7 @@ const Room = () => {
       </div>
 
       {/* LOBBY */}
-      <div className={`lobby ${(room?.state?.gameStarted) && 'hidden'}`}>
+      <div className={`lobby ${(roomState?.gameStarted) && 'hidden'}`}>
         <div className='lobby__header'>
           <div className='room-id-desc'>
             <p>Room ID:<br/>{room?.id}</p>

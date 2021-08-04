@@ -10,8 +10,9 @@
 	background: #010101;
 
 	canvas {
-		width: 80vmax;
-		max-width: 700px;
+		width: 40vw;
+		max-width: 650px;
+		min-width: 500px;
 	}
 
 	&__alert {
@@ -91,14 +92,14 @@
 	background-repeat: no-repeat;
 	user-select: none;
 
-	&:hover {
+	&:active {
 		background: url('/assets/images/lobby-button-pressed.png');
 		background-size: cover;
 		background-repeat: no-repeat;
 		line-height: 5;
 	}
 
-	&[disabled], &[disabled]:hover {
+	&[disabled], &[disabled]:active {
 		color: #5c5c5c;
 		text-shadow: 0 -1.7px 0 #afafaf;
 		background: url('/assets/images/lobby-button-disabled.png');
