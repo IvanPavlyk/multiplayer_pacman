@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 // eslint-disable-next-line no-unused-vars
 import { Form, Button, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
@@ -9,9 +10,21 @@ const Login = () => {
   const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'; //TODO: move to enviornment variable
 
   const onLoginSuccess = (response) => {
-    console.log(response);
-    history.push('/home'); //TODO: push to create account page
-    
+    const profile = response.profileObj;
+    const user = {
+      name: profile.name,
+      email: profile.email
+    };
+
+    axios.post('http://localhost:3002/add-user', user) //TODO: push url to enviornment variable or helper function
+      .then( res => {
+        console.log(res);
+        history.push('/home'); //TODO: push to create account page
+      })
+      .catch ( error => {
+        console.error(error);
+      });
+
   };
 
   const onLoginFailure = (response) => {

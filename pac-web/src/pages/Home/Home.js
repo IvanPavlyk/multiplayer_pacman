@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import { GoogleLogout } from 'react-google-login';
 
-const Room = () => {
+
+
+const Home = (props) => {
   const [id, setValue] = useState('');
   const history = useHistory();
   const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'; //TODO: move to enviornment variable
@@ -42,4 +45,4 @@ const Room = () => {
   );
 };
 
-export default Room;
+export default Home;
