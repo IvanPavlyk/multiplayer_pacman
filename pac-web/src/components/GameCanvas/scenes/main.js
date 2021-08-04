@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 
 export class MainScene extends Phaser.Scene {
   preload() {
-    this.load.image('tiles', '/chompermazetiles.png');
-    this.load.spritesheet('pacman', '/pacman.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.image('tiles', '/game-assets/chompermazetiles.png');
+    this.load.spritesheet('pacman', '/game-assets/pacman.png', { frameWidth: 16, frameHeight: 16 });
     this.cursors = this.input.keyboard.createCursorKeys();
 
     var json2 = require('../level/map3.json');

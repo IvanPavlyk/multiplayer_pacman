@@ -1,0 +1,188 @@
+.room {
+	min-height: auto !important;
+	display: grid;
+	justify-content: center;
+	padding: 15vh 0 3rem;
+}
+
+.lobby {
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	color: var(--white);
+	text-transform: uppercase;
+
+	&__header {
+		display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+		margin-bottom: 3rem;
+	}
+
+	&__buttons {
+		display: flex;
+		padding: 3rem 1.5rem 0;
+		gap: 1.4rem;
+
+		button {
+			width: 200px;
+			height: 70px;
+			cursor: pointer;
+			font-family: 'Press Start 2P', monospace;
+			font-size: 0.9rem;
+			text-transform: uppercase;
+			border: none;
+			background: url('/assets/images/lobby-button.png');
+			background-size: contain;
+			background-repeat: no-repeat;
+		}
+	}
+
+	&__player-list {
+		display: flex;
+		gap: 1.4rem;
+	}
+}
+
+.room-id-desc {
+	text-align: center;
+	color: var(--white);
+	padding: 0.8rem 20% 1rem;
+	border: 2px solid rgba(white, 0.2);
+	border-radius: 8px;
+}
+
+.invite-url-desc {
+	text-align: center;
+
+	input {
+		margin-top: 0.4rem;
+		color: rgba(white, 0.8);
+		padding: 0.6rem 1rem 0.8rem;
+		background: none;
+		border: 2px solid rgba(white, 0.2);
+		border-radius: 8px;
+	}
+}
+
+.chat-box {
+	flex: 1;
+	display: flex;
+	align-items: center;
+
+	input { 
+		width: 100%; 
+		border-radius: 8px;
+		padding: 0.9rem 1.2rem 1rem;
+		background: #010101;
+    border: 1.5px solid currentColor;
+    color: rgba(white, 0.7);
+	}
+}
+
+.player-card {
+	--select-color: #FFF001;
+
+	width: 200px;
+	height: 240px;
+	background: url('/assets/images/player-card-bg.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	user-select: none;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: var(--white);
+	position: relative;
+
+	// spotlight
+	&::after {
+		content: '';
+		width: 60%;
+		height: calc(240 * 0.3 * 1%);
+		background: url('/assets/images/spotlight.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		image-rendering: pixelated;
+
+		position: absolute;
+		top: 0; left: 50%;
+		transform: translateX(-50%);
+	}
+
+	// bootstrap tooltip override
+	.tooltip {
+		opacity: 1;
+		width: 105%;
+		left: 50%;
+		bottom: calc(100% + 3.8rem);
+		transform: translateX(-50%);
+
+		font-size: 17px;
+		font-family: 'Kenney Mini', monospace;
+		letter-spacing: 0.5px;
+		line-height: 1.2;
+		animation: fadeIn 0.3s;
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translate(-50%, 6px); 
+			}
+		}
+
+		.arrow {
+			left: calc(50% - 0.4rem);
+		  
+			&::before {
+				border-top-color: white;
+			}
+		}
+
+		&-inner {
+			background: white;
+			color: #010101;
+		}
+	}
+
+	&__subtitle {
+		text-transform: uppercase;
+	}
+
+	&--is-player {
+		// outline
+		&::before {
+			content: '';
+			position: absolute;
+			top: -3px; bottom: -3px;
+			left: -3px; right: -3px;
+
+			border: 3px solid var(--select-color);
+			border-radius: 12px;
+			opacity: 0.8;
+		}
+	}
+
+	&--inactive {
+		background: url('/assets/images/player-card-bg-off.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+
+		&::after {
+			display: none;
+		}
+
+		.player-card__subtitle {
+			@keyframes flash {
+				0% { opacity: 0.5; }
+				25% { opacity: 0.5; }
+				100% { opacity: 1; }
+			}
+
+			animation: flash 2s steps(3, end) infinite alternate;
+		}
+	}
+}

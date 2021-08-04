@@ -23,6 +23,7 @@
         "quotes": ["warn", "single"],
         "jsx-quotes": ["warn", "prefer-single"],
         "indent": ["warn", 2],
-        "react/prop-types": "off"
+        "react/prop-types": "off",
+        "no-unused-vars": "warn"
     }
 }
