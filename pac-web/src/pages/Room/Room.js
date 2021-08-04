@@ -12,7 +12,7 @@ const Room = () => {
   const client = useColyseus();
   const [ready, setReady] = useState(false);
   const [room, setRoom] = useState(null);
-  const [gameInstance, setGameInstance] = useState(null); 
+  const [gameInstance, setGameInstance] = useState(null);
   const [roomState, setRoomState] = useState({});
 
   useEffect(() => {
@@ -25,12 +25,12 @@ const Room = () => {
       room.onStateChange((newState) => {
         setRoomState({
           ...roomState,
-          ...newState
+          ...newState,
         });
       });
 
       room.onMessage('GAME_START', () => {
-        setGameInstance(<GameCanvas controller={room}/>);
+        setGameInstance(<GameCanvas controller={room} />);
       });
 
       room.send('PLAYER_READY', { ready });
@@ -39,7 +39,7 @@ const Room = () => {
 
   function isRoomAdmin(id) {
     id = id || room?.sessionId;
-    return (roomState?.adminId === id);
+    return roomState?.adminId === id;
   }
 
   function startGame() {
@@ -59,27 +59,29 @@ const Room = () => {
       {/* LOBBY */}
       <div className='lobby'>
         <p>Players in room ({roomState?.players?.size})</p>
-        <p>{JSON.stringify(roomState?.players)}</p>
-        <p>{JSON.stringify(roomState?.ghosts)}</p>
+        <p style={{ width: '760px' }}>{JSON.stringify(roomState?.players)}</p>
+        <p style={{ width: '760px' }}>{JSON.stringify(roomState?.ghosts)}</p>
 
         <div className='player-list'>
           {Array.from(roomState?.players?.values?.() || []).map((player, i) => (
             <Card className='player-card' key={`player-${i}`}>
               <Card.Body>
-                <Card.Title>Player {i+1}</Card.Title>
+                <Card.Title>Player {i + 1}</Card.Title>
 
-                {(isRoomAdmin(player.id)) ? 
-                  <Badge>HOST</Badge> :
-                  <Badge>{(player.ready) ? 'Ready!' : 'Not Ready'}</Badge>}
+                {isRoomAdmin(player.id) ? <Badge>HOST</Badge> : <Badge>{player.ready ? 'Ready!' : 'Not Ready'}</Badge>}
               </Card.Body>
             </Card>
           ))}
         </div>
 
         <div className='lobby__buttons'>
-          {(isRoomAdmin()) ?
-            <button onClick={startGame} disabled={!roomState?.gameCanStart}>Start Game</button> :
-            <button onClick={readyUp}>{(!ready) ? 'Ready' : 'Cancel'}</button>}
+          {isRoomAdmin() ? (
+            <button onClick={startGame} disabled={!roomState?.gameCanStart}>
+              Start Game
+            </button>
+          ) : (
+            <button onClick={readyUp}>{!ready ? 'Ready' : 'Cancel'}</button>
+          )}
         </div>
       </div>
     </Container>

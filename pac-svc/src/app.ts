@@ -17,17 +17,17 @@ app.use(express.json());
 
 const { Pool } = pg;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
 });
 
 app.post('/add-user', async (req, res) => {
   const { name, email } = req.body;
   const template = 'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
-    
+
   let response;
   try {
     response = await pool.query(template, [uuidv4(), name, email]);
-  } catch (error){
+  } catch (error) {
     response = error;
   }
 
