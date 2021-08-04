@@ -6,11 +6,11 @@ import Message from './Message';
 class GameState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
   @type({ map: 'string' }) chatMessages = new MapSchema<string>();
-  @type([Ghost]) ghosts = new ArraySchema<Ghost>();
+  @type({ map: Ghost }) ghosts = new MapSchema<Ghost>();
 
-	@type('boolean') gameCanStart = false;
-	@type('boolean') gameStarted = false;
-	@type('string') adminId = null;
+  @type('boolean') gameCanStart = false;
+  @type('boolean') gameStarted = false;
+  @type('string') adminId = null;
 
   @type(['number']) pellets = new ArraySchema<number>();
   @type(['number']) walls = new ArraySchema<number>();

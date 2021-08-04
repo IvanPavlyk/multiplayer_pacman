@@ -24,19 +24,6 @@
 		display: flex;
 		padding: 3rem 1.5rem 0;
 		gap: 1.4rem;
-
-		button {
-			width: 200px;
-			height: 70px;
-			cursor: pointer;
-			font-family: 'Press Start 2P', monospace;
-			font-size: 0.9rem;
-			text-transform: uppercase;
-			border: none;
-			background: url('/assets/images/lobby-button.png');
-			background-size: contain;
-			background-repeat: no-repeat;
-		}
 	}
 
 	&__player-list {
@@ -66,6 +53,21 @@
 	}
 }
 
+.ready-button {
+	width: 200px;
+	height: 70px;
+	cursor: pointer;
+	font-family: 'Press Start 2P', monospace;
+	font-size: 0.9rem;
+	color: #010101;
+	text-shadow: 0 -1.7px 0 #FFF2D0;
+	text-transform: uppercase;
+	border: none;
+	background: url('/assets/images/lobby-button.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
 .chat-box {
 	flex: 1;
 	display: flex;
@@ -73,11 +75,23 @@
 
 	input { 
 		width: 100%; 
-		border-radius: 8px;
+		border-radius: 8px 0 0 8px;
 		padding: 0.9rem 1.2rem 1rem;
 		background: #010101;
-    border: 1.5px solid currentColor;
+    border: 1.5px solid rgba(white, 0.5);
+		border-right: none;
     color: rgba(white, 0.7);
+	}
+
+	button {
+		background: #0043FF;
+		color: white;
+		border-radius: 0 8px 8px 0;
+		padding: 1.1rem 1.4rem 1.1rem;
+
+		text-transform: uppercase;
+		border: none;
+		border-left: 3px solid darken(#0043FF, 10);
 	}
 }
 

@@ -7,16 +7,18 @@ class Player extends Schema {
   @type('string') queuedDirection = 'right';
   @type('number') x = 0;
   @type('number') y = 0;
+  @type('number') velocity = 3;
+  @type('number') pelletsEaten = 0;
 
   @type('string') id = null;
-  
+
   client: Client = null;
 
-  constructor(client, { x, y }: { x: number; y: number }) {
+  constructor(client: Client, { x, y }: { x: number; y: number }) {
     super();
     this.id = client.id;
     this.client = client;
-    
+
     this.x = x;
     this.y = y;
   }

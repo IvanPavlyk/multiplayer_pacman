@@ -16,7 +16,7 @@ const Room = () => {
   const client = useColyseus();
   const [ready, setReady] = useState(false);
   const [room, setRoom] = useState(null);
-  const [gameInstance, setGameInstance] = useState(null); 
+  const [gameInstance, setGameInstance] = useState(null);
   const [roomState, setRoomState] = useState({});
 
   const [chatMessage, setChatMessage] = useState('');
@@ -27,16 +27,13 @@ const Room = () => {
       if (room == null) return history.push('/');
       window.room = room;
       setRoom(room);
-
+      
       room.onStateChange((newState) => {
-        setRoomState({
-          ...roomState,
-          ...newState
-        });
+        setRoomState(Object.assign({}, newState));
       });
 
       room.onMessage('GAME_START', () => {
-        setGameInstance(<GameCanvas controller={room}/>);
+        setGameInstance(<GameCanvas controller={room} />);
       });
 
       room.send('PLAYER_READY', { ready });
@@ -45,7 +42,7 @@ const Room = () => {
 
   function isRoomAdmin(id) {
     id = id || room?.sessionId;
-    return (roomState?.adminId === id);
+    return roomState?.adminId === id;
   }
 
   function startGame() {
@@ -65,6 +62,7 @@ const Room = () => {
     room.send('SEND_CHAT_MESSAGE', { 
       message: message
     });
+    setChatMessage('');
   }
 
   // get list of players
@@ -77,7 +75,7 @@ const Room = () => {
   return (
     <Container className='room'>
       {/* GAME */}
-      <div style={{ 'text-align': 'center', 'background': '#010101' }}>
+      <div style={{ 'textAlign': 'center', 'background': '#010101' }}>
         {gameInstance}
       </div>
 
@@ -134,8 +132,8 @@ const Room = () => {
 
         <div className='lobby__buttons'>
           {(isRoomAdmin()) ?
-            <button onClick={startGame} disabled={!roomState?.gameCanStart}>Start&thinsp;&thinsp;Game</button> :
-            <button onClick={readyUp}>{(!ready) ? 'Ready' : 'Cancel'}</button>}
+            <button className='ready-button' onClick={startGame} disabled={!roomState?.gameCanStart}>Start&thinsp;&thinsp;Game</button> :
+            <button className='ready-button' onClick={readyUp}>{(!ready) ? 'Ready' : 'Cancel'}</button>}
 
           <div className='chat-box'>
             <input 
@@ -146,10 +144,11 @@ const Room = () => {
               onKeyDown={(e) => {
                 if (e.key !== 'Enter') return;
                 sendChatMessage(chatMessage);
-                setChatMessage('');
               }}
               maxLength='40'
             />
+
+            <button onClick={() => sendChatMessage(chatMessage)}>Send</button>
           </div>
         </div>
       </div>
