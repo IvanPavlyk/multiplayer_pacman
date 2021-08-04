@@ -7,7 +7,7 @@ class GameRoom extends Room<GameState> {
   maxClients = 4;
 
   isAdmin(client: Client): boolean {
-    return (this.state.adminId === client.id);
+    return this.state.adminId === client.id;
   }
 
   startGame(): void {
@@ -22,8 +22,8 @@ class GameRoom extends Room<GameState> {
       return ((n % m) + m) % m;
     }
     this.setState(new GameState());
-    var playerCallbacks = {};
-    var ghostCallbacks = {};
+    const playerCallbacks = {};
+    const ghostCallbacks = {};
 
     /* lobby event listeners */
     this.onMessage('PLAYER_READY', (client, message) => {
@@ -32,7 +32,7 @@ class GameRoom extends Room<GameState> {
 
       // check if game can start (all players are ready)
       const players = Array.from(this.state.players.values());
-      
+
       let playersReady = 0;
       for (const player of players) {
         if (!this.isAdmin(player.client)) {
@@ -40,7 +40,7 @@ class GameRoom extends Room<GameState> {
         }
       }
 
-      this.state.gameCanStart = (players.length > 1 && playersReady >= players.length-1);
+      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
     });
 
     this.onMessage('START_GAME', (client) => {
@@ -71,7 +71,7 @@ class GameRoom extends Room<GameState> {
         this.state.height = message.height;
       }
       //Setting up ghost movement
-      if(!(client.id in ghostCallbacks)){
+      if (!(client.id in ghostCallbacks)) {
         this.state.ghosts.set(client.id, new Ghost({ x: 11 * 32 + 16, y: 8 * 32 + 16 }));
         const ghost = this.state.ghosts.get(client.id);
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
@@ -81,11 +81,11 @@ class GameRoom extends Room<GameState> {
             (['right', 'left'].indexOf(ghost.direction) !== -1 && mod(ghost.x, 32) === 16) ||
             (['up', 'down'].indexOf(ghost.direction) !== -1 && mod(ghost.y, 32) === 16)
           ) {
-            if(ghost.x <= -16){
-              ghost.x = state.width*32 - 1;
+            if (ghost.x <= -16) {
+              ghost.x = state.width * 32 - 1;
               return;
             }
-            if(ghost.x > state.width*32){
+            if (ghost.x > state.width * 32) {
               ghost.x = -15;
               return;
             }
@@ -96,7 +96,10 @@ class GameRoom extends Room<GameState> {
               return value !== walls[oppDirection];
             });
             walls = walls.filter(function (value) {
-              if(Math.floor(ghost.x / 32) + dirDict[value][0] === state.width || Math.floor(ghost.x / 32) + dirDict[value][0] === -1){
+              if (
+                Math.floor(ghost.x / 32) + dirDict[value][0] === state.width ||
+                Math.floor(ghost.x / 32) + dirDict[value][0] === -1
+              ) {
                 return true;
               }
               return !state
@@ -105,66 +108,74 @@ class GameRoom extends Room<GameState> {
             const distWalls = [];
             walls.forEach((val) => {
               distWalls.push(
-                Math.sqrt(Math.pow(Math.floor(ghost.x / 32) + dirDict[val][0] - Math.floor(player.x / 32), 2) +
-                  Math.pow(Math.floor(ghost.y / 32) + dirDict[val][1] - Math.floor(player.y / 32), 2))
+                Math.sqrt(
+                  Math.pow(Math.floor(ghost.x / 32) + dirDict[val][0] - Math.floor(player.x / 32), 2) +
+                    Math.pow(Math.floor(ghost.y / 32) + dirDict[val][1] - Math.floor(player.y / 32), 2)
+                )
               );
             });
             ghost.direction = walls[distWalls.indexOf(Math.min(...distWalls))];
           }
-          if(ghost.direction){
+          if (ghost.direction) {
             ghost.x += dirDict[ghost.direction][0];
             ghost.y += dirDict[ghost.direction][1];
           }
         }, 10);
       }
-      if(!(client.id in playerCallbacks)){
+      if (!(client.id in playerCallbacks)) {
         const state = this.state;
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
-        playerCallbacks[client.id] = setInterval(()=>{
+        playerCallbacks[client.id] = setInterval(() => {
           let check = false;
-            if (
-              (['right', 'left'].indexOf(player.direction) !== -1 && mod(player.x, 32) > (16 - pacmanBaseVelocity/2) && mod(player.x, 32) < (16 + pacmanBaseVelocity/2)) ||
-              (['up', 'down'].indexOf(player.direction) !== -1 && mod(player.y, 32) > (16 - pacmanBaseVelocity/2) && mod(player.y, 32) < (16 + pacmanBaseVelocity/2))
-            ) {
-              if(player.x <= -16){
-                player.x = state.width*32 - player.velocity;
-                return;
-              }
-              if(player.x > state.width*32){
-                player.x = -16 + player.velocity;
-                return;
-              }
-              if(state.pellets[Math.floor(player.x/32) + Math.floor(player.y/32)*this.state.width]){
-                state.pellets[Math.floor(player.x/32) + Math.floor(player.y/32)*this.state.width] = 0;
-                player.pelletsEaten += 1;
-              }
-              let walls = ['up', 'down', 'right', 'left'];
-              walls = walls.filter(function (value) {
-                if(Math.floor(player.x / 32) + dirDict[value][0] === state.width || Math.floor(player.x / 32) + dirDict[value][0] === -1){
-                  return true;
-                }
-                return !state
-                  .walls[Math.floor(player.x / 32) + dirDict[value][0] + (Math.floor(player.y / 32) + dirDict[value][1]) * state.width];
-              });
-              if(player.queuedDirection !== player.direction && walls.indexOf(player.queuedDirection) !== -1){
-                check = true;
-                if(['right', 'left'].indexOf(player.queuedDirection) !== -1){
-                  player.y = Math.floor(player.y/32)*32 + 16;
-                }
-                if(['up', 'down'].indexOf(player.queuedDirection) !== -1){
-                  player.x = Math.floor(player.x/32)*32 + 16;
-                }
-                player.direction = player.queuedDirection;
-                player.velocity = 3;
-              }
-              else if(walls.indexOf(player.direction) === -1){
-                player.velocity = 0; 
-              }
+          if (
+            (['right', 'left'].indexOf(player.direction) !== -1 &&
+              mod(player.x, 32) > 16 - pacmanBaseVelocity / 2 &&
+              mod(player.x, 32) < 16 + pacmanBaseVelocity / 2) ||
+            (['up', 'down'].indexOf(player.direction) !== -1 &&
+              mod(player.y, 32) > 16 - pacmanBaseVelocity / 2 &&
+              mod(player.y, 32) < 16 + pacmanBaseVelocity / 2)
+          ) {
+            if (player.x <= -16) {
+              player.x = state.width * 32 - player.velocity;
+              return;
             }
-            if(player.direction && !check){
-              player.x += dirDict[player.direction][0]*player.velocity;
-              player.y += dirDict[player.direction][1]*player.velocity;
+            if (player.x > state.width * 32) {
+              player.x = -16 + player.velocity;
+              return;
             }
+            if (state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width]) {
+              state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width] = 0;
+              player.pelletsEaten += 1;
+            }
+            let walls = ['up', 'down', 'right', 'left'];
+            walls = walls.filter(function (value) {
+              if (
+                Math.floor(player.x / 32) + dirDict[value][0] === state.width ||
+                Math.floor(player.x / 32) + dirDict[value][0] === -1
+              ) {
+                return true;
+              }
+              return !state
+                .walls[Math.floor(player.x / 32) + dirDict[value][0] + (Math.floor(player.y / 32) + dirDict[value][1]) * state.width];
+            });
+            if (player.queuedDirection !== player.direction && walls.indexOf(player.queuedDirection) !== -1) {
+              check = true;
+              if (['right', 'left'].indexOf(player.queuedDirection) !== -1) {
+                player.y = Math.floor(player.y / 32) * 32 + 16;
+              }
+              if (['up', 'down'].indexOf(player.queuedDirection) !== -1) {
+                player.x = Math.floor(player.x / 32) * 32 + 16;
+              }
+              player.direction = player.queuedDirection;
+              player.velocity = 3;
+            } else if (walls.indexOf(player.direction) === -1) {
+              player.velocity = 0;
+            }
+          }
+          if (player.direction && !check) {
+            player.x += dirDict[player.direction][0] * player.velocity;
+            player.y += dirDict[player.direction][1] * player.velocity;
+          }
         }, 10);
       }
     });
@@ -182,7 +193,7 @@ class GameRoom extends Room<GameState> {
       this.state.adminId = client.id;
     }
   }
-  
+
   async onLeave(client: Client): Promise<void> {
     const player = this.state.players.get(client.id);
     const prevAdminId = this.state.adminId;
@@ -194,7 +205,7 @@ class GameRoom extends Room<GameState> {
       const playerIds = Array.from(this.state.players.keys());
       this.state.adminId = playerIds.shift();
     }
-    
+
     try {
       // allow disconnected client to reconnect into this room until 10 seconds
       await this.allowReconnection(client, 10);
@@ -204,8 +215,7 @@ class GameRoom extends Room<GameState> {
       if (prevAdminId === client.id) {
         this.state.adminId = client.id;
       }
-
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     }
   }

@@ -43,7 +43,7 @@ export class MainScene extends Phaser.Scene {
 
     this.playerDirection = undefined;
     // this.queuedPlayerDirection = undefined;
-    this.players = {[this.controller.sessionId] :this.physics.add.sprite(48, 48, 'pacman', 0)};
+    this.players = { [this.controller.sessionId]: this.physics.add.sprite(48, 48, 'pacman', 0) };
     this.players[this.controller.sessionId].setScale(2);
     // this.players[this.controller.sessionId].setCollideWorldBounds(true);
     this.physics.add.collider(this.players[this.controller.sessionId], this.BaseLayer);
@@ -70,7 +70,7 @@ export class MainScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.ghosts = {[this.controller.sessionId] : this.physics.add.sprite(-100, -100, 'pacman', 52)};
+    this.ghosts = { [this.controller.sessionId]: this.physics.add.sprite(-100, -100, 'pacman', 52) };
     this.ghosts[this.controller.sessionId].setScale(2);
     // this.ghosts[this.controller.sessionId].setCollideWorldBounds(true);
     this.physics.add.collider(this.ghosts[this.controller.sessionId], this.BaseLayer);
@@ -99,10 +99,10 @@ export class MainScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-    
+
     this.controller.onStateChange((newState) => {
       newState.players.forEach((player, index) => {
-        if(!this.players[index]){
+        if (!this.players[index]) {
           this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
           this.players[index].setScale(2);
           // this.players[index].setCollideWorldBounds(true);
@@ -133,17 +133,17 @@ export class MainScene extends Phaser.Scene {
           this.players[index].setVelocityX(0);
           this.players[index].setVelocityY(200);
           this.players[index].flipX = true;
-          this.players[index].setRotation(-3.14/2);
+          this.players[index].setRotation(-3.14 / 2);
         }
-        if(player.velocity === 0){
+        if (player.velocity === 0) {
           this.players[index].setVelocityX(0);
           this.players[index].setVelocityY(0);
           this.players[index].anims.play('moving', false);
         }
       });
-    
-      for(let session in this.players){
-        if(!newState.players.get(session)){
+
+      for (let session in this.players) {
+        if (!newState.players.get(session)) {
           this.players[session].destroy();
           delete this.players[session];
           this.ghosts[session].destroy();
@@ -151,7 +151,7 @@ export class MainScene extends Phaser.Scene {
         }
       }
       newState.ghosts.forEach((ghost, index) => {
-        if(!this.ghosts[index]){
+        if (!this.ghosts[index]) {
           this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
           this.ghosts[index].setScale(2);
           // this.ghosts[index].setCollideWorldBounds(true);

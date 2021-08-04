@@ -11,14 +11,14 @@ class Player extends Schema {
   @type('number') pelletsEaten = 0;
 
   @type('string') id = null;
-  
+
   client: Client = null;
 
-  constructor(client, { x, y }: { x: number; y: number }) {
+  constructor(client: Client, { x, y }: { x: number; y: number }) {
     super();
     this.id = client.id;
     this.client = client;
-    
+
     this.x = x;
     this.y = y;
   }
