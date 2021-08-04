@@ -64,8 +64,25 @@
 	text-transform: uppercase;
 	border: none;
 	background: url('/assets/images/lobby-button.png');
-	background-size: contain;
+	background-size: cover;
 	background-repeat: no-repeat;
+	user-select: none;
+
+	&:hover {
+		background: url('/assets/images/lobby-button-pressed.png');
+		background-size: cover;
+		background-repeat: no-repeat;
+		line-height: 5;
+	}
+
+	&[disabled], &[disabled]:hover {
+		color: #5c5c5c;
+		text-shadow: 0 -1.7px 0 #afafaf;
+		background: url('/assets/images/lobby-button-disabled.png');
+		background-size: cover;
+		background-repeat: no-repeat;
+		line-height: 0;
+	}
 }
 
 .chat-box {
@@ -76,7 +93,7 @@
 	input { 
 		width: 100%; 
 		border-radius: 8px 0 0 8px;
-		padding: 0.9rem 1.2rem 1rem;
+		padding: 0.8rem 1.2rem 0.9rem;
 		background: #010101;
     border: 1.5px solid rgba(white, 0.5);
 		border-right: none;
@@ -87,7 +104,7 @@
 		background: #0043FF;
 		color: white;
 		border-radius: 0 8px 8px 0;
-		padding: 1.1rem 1.4rem 1.1rem;
+		padding: 1rem 1.4rem 1rem;
 
 		text-transform: uppercase;
 		border: none;

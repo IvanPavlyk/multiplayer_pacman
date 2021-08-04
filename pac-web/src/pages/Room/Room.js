@@ -121,8 +121,10 @@ const Room = () => {
                   </div>
 
                   <p>
-                    <img style={{ 'margin': '0 0.3rem 2.5px 0'}} src={icon_crown}/>
-                    Host
+                    {(isRoomAdmin(player.id)) ? 
+                      <span><img style={{ 'margin': '0 0.3rem 2.5px 0'}} src={icon_crown}/>Host</span> :
+                      <span>{(player.ready) ? 'ready!' : 'not ready'}</span>
+                    }
                   </p>
                 </div>
               )
