@@ -46,28 +46,13 @@ const gameServer = new Server({
 gameServer.define('game-room', GameRoom);
 gameServer.listen(port);
 
-app.put('/globalStats', async (req, res) => {
-  const { pelletsEaten, ghostsEaten, playersEaten } = req.body;
-  
-  const query = `UPDATE pacman."GlobalStats" 
-          SET pelletsEaten = pelletsEaten + $1,
-              gamesPlayed = gamesPlayed + 1,
-              ghostsEaten = ghostsEaten + $2,
-              playersEaten = playersEaten + $3 
-    `;
-  const values = [pelletsEaten, ghostsEaten, playersEaten];
-  
-  try {
-    const response = await pool.query(query, values);
-    res.send(response);
-  } catch (err) {
-    res.status(400).send({ error: 'request failed' });
-    console.error(err.stack);
-  }
-});
-
 app.get('/globalStats', async (req, res) => {
-  const query = 'SELECT * FROM pacman."GlobalStats"';
+  const query = `SELECT SUM("pelletsEaten") AS pelletsEaten,
+            COUNT(DISTINCT "gameId") AS gamesPlayed,
+            SUM("ghostsEaten") AS ghostsEaten,
+            SUM("playersEaten") AS playersEaten
+        FROM pacman."MatchHistory"
+  `;
 
   try {
     const response = await pool.query(query);
@@ -79,3 +64,42 @@ app.get('/globalStats', async (req, res) => {
   }
 });
 
+//  Create match history for a single user
+app.post('/match-history', async (req, res) => {
+  const { userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten } =
+    req.body;
+
+  const query =
+    'INSERT INTO pacman."MatchHistory"("userId", "gameId", result, "pelletsEaten", "ghostsEaten", "playersEaten") VALUES ($1, $2, $3, $4, $5, $6)';
+
+  const values = [
+    userId,
+    gameId,
+    result,
+    pelletsEaten,
+    ghostsEaten,
+    playersEaten,
+  ];
+  try {
+    const response = await pool.query(query, values);
+    res.send(response);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(404).send({ error: 'Missing params' });
+  }
+});
+
+// Get all matches for a single user ?userId:id
+app.get('/match-history', async (req, res) => {
+  const userId = req.query.userId;
+  const query = 'SELECT * FROM pacman."MatchHistory" WHERE "userId" = $1';
+
+  try {
+    const response = await pool.query(query, [userId]);
+
+    res.send(response.rows);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(404).send({ error: err });
+  }
+});
