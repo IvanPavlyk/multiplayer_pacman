@@ -75,8 +75,32 @@ const Room = () => {
   return (
     <Container className='room'>
       {/* GAME */}
-      <div style={{ 'textAlign': 'center', 'background': '#010101' }}>
+      <div className={`game ${(!room?.state?.gameStarted) && 'hidden'}`}>
+        <div className='game__alert'>
+          Get ready!
+        </div>
+
         {gameInstance}
+
+        <div className='game__player-list'>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman}/>
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman}/>
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman}/>
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman}/>
+            <p>UberHaxor69</p>
+          </div>
+        </div>
+
       </div>
 
       {/* LOBBY */}

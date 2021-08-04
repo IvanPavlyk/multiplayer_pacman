@@ -5,6 +5,29 @@
 	padding: 15vh 0 3rem;
 }
 
+.game {
+	text-align: center;
+	background: #010101;
+
+	canvas {
+		width: 80vmax;
+		max-width: 700px;
+	}
+
+	&__alert {
+		font-family: 'Press Start 2P', monospace;
+		font-size: 0.8rem;
+		color: white;
+		padding: 1.2rem 1rem 1rem;
+	}
+
+	&__player-list {
+		padding: 1.5rem 1rem 1rem;
+		display: flex;
+		gap: 1rem;
+	}
+}
+
 .lobby {
 	display: flex;
 	align-items: stretch;
@@ -181,6 +204,19 @@
 
 	&__subtitle {
 		text-transform: uppercase;
+	}
+
+	&--mini {
+		flex-direction: row;
+		gap: 0.4rem;
+		font-size: 0.9rem;
+		height: 71px;
+
+		background: url('/assets/images/player-card-bg-mini.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+
+		&::after { display: none; }
 	}
 
 	&--is-player {

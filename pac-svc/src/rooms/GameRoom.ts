@@ -221,6 +221,8 @@ class GameRoom extends Room<GameState> {
     }
 
     try {
+      if (this.state.gameStarted) return;
+      
       // allow disconnected client to reconnect into this room until 10 seconds
       await this.allowReconnection(client, 10);
       this.state.players.set(client.id, player);
