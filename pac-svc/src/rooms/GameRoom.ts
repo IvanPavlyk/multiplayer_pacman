@@ -5,6 +5,7 @@ import Ghost from '../schema/Ghost';
 
 class GameRoom extends Room<GameState> {
   maxClients = 4;
+  messageTimeouts = {};
 
   isAdmin(id: string): boolean {
     return this.state.adminId === id;
@@ -41,8 +42,21 @@ class GameRoom extends Room<GameState> {
       this.state.gameCanStart = this.state.players.size > 1 && playersReady >= this.state.players.size - 1;
     });
 
+    this.onMessage('SEND_CHAT_MESSAGE', (client, message) => {
+      const timeout = this.messageTimeouts[client.id];
+      if (timeout) clearTimeout(timeout);
+
+      this.state.chatMessages.set(client.id, message?.message);
+
+      // set a timeout to clear out the message
+      this.messageTimeouts[client.id] = setTimeout(() => {
+        this.state.chatMessages.set(client.id, '');
+      }, 7000);
+    });
+
     this.onMessage('START_GAME', (client) => {
-      if (this.state.gameCanStart && this.isAdmin(client.id)) {
+      if (!this.state.gameCanStart || this.state.gameStarted) return;
+      if (this.isAdmin(client.id)) {
         this.startGame();
       }
     });
@@ -208,6 +222,8 @@ class GameRoom extends Room<GameState> {
     }
 
     try {
+      if (this.state.gameStarted) return;
+
       // allow disconnected client to reconnect into this room until 10 seconds
       await this.allowReconnection(client, 10);
       this.state.players.set(client.id, player);

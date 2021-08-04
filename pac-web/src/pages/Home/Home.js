@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 import { useColyseus } from 'components/ColyseusClient';
 import { useHistory } from 'react-router-dom';
 
@@ -18,7 +19,7 @@ const Room = () => {
   };
 
   return (
-    <div>
+    <Container>
       <Link to='/login'>To Login</Link>
 
       <br />
@@ -31,7 +32,7 @@ const Room = () => {
         onChange={(e) => setValue(e.target.value)}
       />
       <button onClick={() => joinRoom(id)}>Join by id</button>
-    </div>
+    </Container>
   );
 };
 

@@ -1,9 +1,11 @@
 import { type, Schema, MapSchema, ArraySchema } from '@colyseus/schema';
 import Player from './Player';
 import Ghost from './Ghost';
+import Message from './Message';
 
 class GameState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
+  @type({ map: 'string' }) chatMessages = new MapSchema<string>();
   @type({ map: Ghost }) ghosts = new MapSchema<Ghost>();
 
   @type('boolean') gameCanStart = false;

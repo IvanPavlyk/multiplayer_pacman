@@ -1,0 +1,50 @@
+*, *::after, *::before {
+	box-sizing: border-box;
+	outline: none;
+}
+
+:root {
+	--black: #010101;
+	--yellow: #FFF001;
+	--blue: #3135B7;
+	--orange: #F8B800;
+}
+
+body {
+	background: var(--black);
+	image-rendering: pixelated;
+	text-rendering: optimizeSpeed;
+
+	font-size: 17px;
+	font-family: 'Kenney Mini', monospace;
+	letter-spacing: 0.5px;
+	line-height: 1.2;
+}
+
+p {
+	margin: 0;
+}
+
+/* bootstrap overrides */
+.container {
+	width: 1024px;
+	max-width: 100%;
+	min-height: 100vh;
+	background: #1F2136;
+	border-radius: 0 0 4px 4px;
+
+	box-shadow: 
+		5px 0 0 darken(#1F2136, 2),
+		7px 0 0 darken(#1F2136, 5),
+		-5px 0 0 darken(#1F2136, 2),
+		-7px 0 0 darken(#1F2136, 5);
+}
+
+/* helper utility classes */
+.uppercase {
+	text-transform: uppercase;
+}
+
+.hidden {
+  display: none;
+}

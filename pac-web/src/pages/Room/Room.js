@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Badge } from 'react-bootstrap';
+import { Container, Tooltip } from 'react-bootstrap';
 import { useColyseus } from 'components/ColyseusClient';
 import { useParams, useHistory } from 'react-router-dom';
 import GameCanvas from 'components/GameCanvas';
 
-import './room.css';
+import player_pacman from 'assets/images/player-pacman.png';
+import player_select_title from 'assets/images/player-select-title.png';
+import icon_crown from 'assets/images/icon-crown.png';
+
+import './room.scss';
 
 const Room = () => {
   const { id } = useParams();
@@ -14,7 +18,8 @@ const Room = () => {
   const [room, setRoom] = useState(null);
   const [gameInstance, setGameInstance] = useState(null);
   const [roomState, setRoomState] = useState({});
-  const [cards, setCards] = useState([]);
+
+  const [chatMessage, setChatMessage] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -24,10 +29,7 @@ const Room = () => {
       setRoom(room);
 
       room.onStateChange((newState) => {
-        setRoomState({
-          ...roomState,
-          ...newState,
-        });
+        setRoomState(Object.assign({}, newState));
       });
 
       room.onMessage('GAME_START', () => {
@@ -37,24 +39,6 @@ const Room = () => {
       room.send('PLAYER_READY', { ready });
     })();
   }, []);
-
-  useEffect(() => {
-    let temp = [];
-    if (roomState && roomState.players) {
-      roomState.players.forEach((player, key) => {
-        console.log(player, key);
-        temp.push(
-          <Card className='player-card' key={`player-${player.id}`}>
-            <Card.Body>
-              <Card.Title>Player {player.id + 1}</Card.Title>
-              {isRoomAdmin(key) ? <Badge>HOST</Badge> : <Badge>{player.ready ? 'Ready!' : 'Not Ready'}</Badge>}
-            </Card.Body>
-          </Card>
-        );
-      });
-      setCards([...temp]);
-    }
-  }, [roomState]);
 
   function isRoomAdmin(id) {
     id = id || room?.sessionId;
@@ -67,30 +51,140 @@ const Room = () => {
 
   function readyUp() {
     setReady(!ready);
-    room.send('PLAYER_READY', { ready: !ready });
+    room.send('PLAYER_READY', {
+      ready: !ready,
+    });
+  }
+
+  function sendChatMessage(message) {
+    message = message.trim();
+    if (!message) return;
+    room.send('SEND_CHAT_MESSAGE', {
+      message: message,
+    });
+    setChatMessage('');
+  }
+
+  // get list of players
+  const players = Array.from(roomState?.players?.values?.() || []);
+  const length = players.length;
+  for (let i = 0; i < 4 - length; i++) {
+    players.push(null);
   }
 
   return (
     <Container className='room'>
       {/* GAME */}
-      {gameInstance}
+      <div className={`game ${!room?.state?.gameStarted && 'hidden'}`}>
+        <div className='game__alert'>Get ready!</div>
+
+        {gameInstance}
+
+        <div className='game__player-list'>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman} />
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman} />
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman} />
+            <p>UberHaxor69</p>
+          </div>
+          <div className='player-card player-card--mini'>
+            <img width='20' src={player_pacman} />
+            <p>UberHaxor69</p>
+          </div>
+        </div>
+      </div>
 
       {/* LOBBY */}
-      <div className='lobby'>
-        <p>Players in room ({roomState?.players?.size})</p>
-        <p style={{ width: '760px' }}>{JSON.stringify(roomState?.players)}</p>
-        <p style={{ width: '760px' }}>{JSON.stringify(roomState?.ghosts)}</p>
+      <div className={`lobby ${room?.state?.gameStarted && 'hidden'}`}>
+        <div className='lobby__header'>
+          <div className='room-id-desc'>
+            <p>
+              Room ID:
+              <br />
+              {room?.id}
+            </p>
+          </div>
 
-        <div className='player-list'>{cards}</div>
+          <img style={{ width: '70%' }} src={player_select_title} />
+
+          <div className='invite-url-desc'>
+            <p>Invite URL</p>
+            <input type='text' value={window.location} onClick={(e) => e.target.select()} />
+          </div>
+        </div>
+
+        <div className='lobby__player-list'>
+          {players.map((player, i) => {
+            if (player == null) {
+              return (
+                <div className='player-card player-card--inactive' key={`p-${i}`}>
+                  <p>Open Slot</p>
+                  <p className='player-card__subtitle'>Invite Players!</p>
+                </div>
+              );
+            } else {
+              const chatMessage = roomState?.chatMessages?.get?.(player.id);
+
+              return (
+                <div
+                  className={`player-card ${player.id === room?.sessionId && 'player-card--is-player'}`}
+                  key={`p-${i}`}
+                >
+                  <img style={{ margin: '1.4rem 0 0.6rem' }} src={player_pacman} />
+
+                  <div style={{ position: 'relative' }}>
+                    {chatMessage && <Tooltip placement='top'>{chatMessage}</Tooltip>}
+                    <p>UberHaxor69</p>
+                  </div>
+
+                  <p>
+                    {isRoomAdmin(player.id) ? (
+                      <span>
+                        <img style={{ margin: '0 0.3rem 2.5px 0' }} src={icon_crown} />
+                        Host
+                      </span>
+                    ) : (
+                      <span>{player.ready ? 'ready!' : 'not ready'}</span>
+                    )}
+                  </p>
+                </div>
+              );
+            }
+          })}
+        </div>
 
         <div className='lobby__buttons'>
           {isRoomAdmin() ? (
-            <button onClick={startGame} disabled={!roomState?.gameCanStart}>
-              Start Game
+            <button className='ready-button' onClick={startGame} disabled={!roomState?.gameCanStart}>
+              Start&thinsp;&thinsp;Game
             </button>
           ) : (
-            <button onClick={readyUp}>{!ready ? 'Ready' : 'Cancel'}</button>
+            <button className='ready-button' onClick={readyUp}>
+              {!ready ? 'Ready' : 'Cancel'}
+            </button>
           )}
+
+          <div className='chat-box'>
+            <input
+              type='text'
+              value={chatMessage}
+              placeholder='Send a message to other players...'
+              onChange={(e) => setChatMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== 'Enter') return;
+                sendChatMessage(chatMessage);
+              }}
+              maxLength='40'
+            />
+
+            <button onClick={() => sendChatMessage(chatMessage)}>Send</button>
+          </div>
         </div>
       </div>
     </Container>
