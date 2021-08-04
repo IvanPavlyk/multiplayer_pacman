@@ -187,6 +187,7 @@ class GameRoom extends Room<GameState> {
     const player = this.state.players.get(client.id);
     const prevAdminId = this.state.adminId;
     this.state.players.delete(client.id);
+    this.state.ghosts.delete(client.id);
 
     // assign a random player admin if admin leaves
     if (prevAdminId === client.id) {

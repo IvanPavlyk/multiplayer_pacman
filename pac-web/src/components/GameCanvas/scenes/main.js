@@ -99,39 +99,8 @@ export class MainScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-
+    
     this.controller.onStateChange((newState) => {
-      newState.ghosts.forEach((ghost, index) => {
-        if(!this.ghosts[index]){
-          this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
-          this.ghosts[index].setScale(2);
-          // this.ghosts[index].setCollideWorldBounds(true);
-          this.physics.add.collider(this.ghosts[index], this.BaseLayer);
-        }
-        this.ghosts[index].x = ghost.x;
-        this.ghosts[index].y = ghost.y;
-        if (ghost.direction === 'right') {
-          this.ghosts[index].setVelocityX(67);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].anims.play('ghostRight', true);
-        }
-        if (ghost.direction === 'left') {
-          this.ghosts[index].setVelocityX(-67);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].anims.play('ghostLeft', true);
-        }
-        if (ghost.direction === 'up') {
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(-67);
-          this.ghosts[index].anims.play('ghostUp', true);
-        }
-        if (ghost.direction === 'down') {
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(67);
-          this.ghosts[index].anims.play('ghostDown', true);
-        }
-      });
-
       newState.players.forEach((player, index) => {
         if(!this.players[index]){
           this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
@@ -170,6 +139,45 @@ export class MainScene extends Phaser.Scene {
           this.players[index].setVelocityX(0);
           this.players[index].setVelocityY(0);
           this.players[index].anims.play('moving', false);
+        }
+      });
+    
+      for(let session in this.players){
+        if(!newState.players.get(session)){
+          this.players[session].destroy();
+          delete this.players[session];
+          this.ghosts[session].destroy();
+          delete this.ghosts[session];
+        }
+      }
+      newState.ghosts.forEach((ghost, index) => {
+        if(!this.ghosts[index]){
+          this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
+          this.ghosts[index].setScale(2);
+          // this.ghosts[index].setCollideWorldBounds(true);
+          this.physics.add.collider(this.ghosts[index], this.BaseLayer);
+        }
+        this.ghosts[index].x = ghost.x;
+        this.ghosts[index].y = ghost.y;
+        if (ghost.direction === 'right') {
+          this.ghosts[index].setVelocityX(67);
+          this.ghosts[index].setVelocityY(0);
+          this.ghosts[index].anims.play('ghostRight', true);
+        }
+        if (ghost.direction === 'left') {
+          this.ghosts[index].setVelocityX(-67);
+          this.ghosts[index].setVelocityY(0);
+          this.ghosts[index].anims.play('ghostLeft', true);
+        }
+        if (ghost.direction === 'up') {
+          this.ghosts[index].setVelocityX(0);
+          this.ghosts[index].setVelocityY(-67);
+          this.ghosts[index].anims.play('ghostUp', true);
+        }
+        if (ghost.direction === 'down') {
+          this.ghosts[index].setVelocityX(0);
+          this.ghosts[index].setVelocityY(67);
+          this.ghosts[index].anims.play('ghostDown', true);
         }
       });
     });

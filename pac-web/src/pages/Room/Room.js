@@ -59,8 +59,8 @@ const Room = () => {
       {/* LOBBY */}
       <div className='lobby'>
         <p>Players in room ({roomState?.players?.size})</p>
-        <p>{JSON.stringify(roomState?.players)}</p>
-        <p>{JSON.stringify(roomState?.ghosts)}</p>
+        <p style={{width:"760px"}}>{JSON.stringify(roomState?.players)}</p>
+        <p style={{width:"760px"}}>{JSON.stringify(roomState?.ghosts)}</p>
 
         <div className='player-list'>
           {Array.from(roomState?.players?.values?.() || []).map((player, i) => (
