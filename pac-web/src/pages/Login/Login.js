@@ -15,14 +15,14 @@ const Login = () => {
       name: profile.name,
       email: profile.email
     };
+    sessionStorage.setItem('tokenId', response.tokenId);
     console.log(response);
 
     axios.post('http://localhost:3002/auth/user-exists', user)
       .then (res => {
-        console.log(res);
-        console.log(parseInt(res.data.rowCount) === 1);
+        //TODO: clean up localstorage call
         if(parseInt(res.data.rowCount) === 1) {
-          console.log('account exists');
+          sessionStorage.setItem('id', res.data.rows[0].id);
           history.push('/home');
         } else {
           history.push({

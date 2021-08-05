@@ -2,6 +2,7 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import './style.css';
 
+
 const Account = () => {
   return(
     <Container>
@@ -14,10 +15,6 @@ const Account = () => {
           <tr>
             <th scope='row'>USERNAME</th>
             <td>TheLegend42</td>
-          </tr>
-          <tr>
-            <th scope='row'>NAME</th>
-            <td>Mark John</td>
           </tr>
           <tr>
             <th scope='row'>EMAIL</th>

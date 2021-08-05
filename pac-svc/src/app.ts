@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import * as pg from 'pg';
 import express from 'express';
 import cors from 'cors';
+import { OAuth2Client } from 'google-auth-library';
 import { Server } from 'colyseus';
 import { createServer } from 'http';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,48 +23,38 @@ const pool = new Pool({
 
 //TODO: add username field
 app.post('/add-user', async (req, res) => {
-    const { name, email } = req.body;
-    const template = `INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)`;
+  const { username, email } = req.body;
+  const query = 'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
 
-    let response;
-    try {
-        response = await pool.query(template, [uuidv4(), name, email]);
-    } catch (error) {
-        response = error;
-    }
-    res.send(response);
+  let response;
+  try {
+    response = await pool.query(query, [uuidv4(), username, email]);
+  } catch (error) {
+    response = error;
+  }
+  res.send(response);
 });
 
 //Will return an empty array if the user does not exist
 app.post('/auth/user-exists', async (req, res) => {
-    console.log(req.body);
-    
-    const { email } = req.body;
-    const template = `SELECT * FROM pacman."User" WHERE email= ($1)`;
-    let response;
-    try {
-        response = await pool.query(template, [email]);
-    } catch (error) {
-        response = error;    
-    }
+  console.log(req.body);
+
+  const { email } = req.body;
+  const query = 'SELECT * FROM pacman."User" WHERE email= ($1)';
+  try {
+    const response = await pool.query(query, [email]);
     res.send(response);
-})
-
-app.get('/auth/user-is-authenticated', (req, res) => {
-    console.log(req);
-    res.send("Received");
-})
-
-app.listen(app.get("port"), () => {
-    console.log(`Server at: http://localhost:${app.get("port")}/`);
+    
+  } catch (error) {
+    res.send(error);
+  }
 });
 
-const gameServer = new Server({
-  server: createServer(app),
+app.get('/auth/user-is-authenticated/:tokenID', (req, res) => {
+  console.log(req.params.tokenID);
+  //TODO: finish this
+  res.send('Received');
 });
-
-gameServer.define('game-room', GameRoom);
-gameServer.listen(port);
 
 app.get('/globalStats', async (req, res) => {
   const query = `SELECT SUM("pelletsEaten") AS pelletsEaten,
@@ -108,9 +99,8 @@ app.post('/match-history', async (req, res) => {
   }
 });
 
-// Get all matches for a single user ?userId:id
-app.get('/match-history', async (req, res) => {
-  const userId = req.query.userId;
+app.get('/match-history/:userId', async (req, res) => {
+  const userId = req.params.userId;
   const query = 'SELECT * FROM pacman."MatchHistory" WHERE "userId" = $1';
 
   try {
@@ -122,3 +112,14 @@ app.get('/match-history', async (req, res) => {
     res.status(404).send({ error: err });
   }
 });
+
+app.listen(app.get('port'), () => {
+  console.log(`Server at: http://localhost:${app.get('port')}/`);
+});
+
+const gameServer = new Server({
+  server: createServer(app),
+});
+
+gameServer.define('game-room', GameRoom);
+gameServer.listen(port);
