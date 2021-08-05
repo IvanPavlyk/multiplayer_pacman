@@ -9,6 +9,7 @@ class Player extends Schema {
   @type('number') y = 0;
   @type('number') velocity = 3;
   @type('number') pelletsEaten = 0;
+  @type('number') tint = 0xffff00;
 
   @type('string') id = null;
 

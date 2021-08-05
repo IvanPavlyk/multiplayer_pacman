@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Overlay, Tooltip } from 'react-bootstrap';
+import { Container, Tooltip } from 'react-bootstrap';
 import { useColyseus } from 'components/ColyseusClient';
 import { useParams, useHistory } from 'react-router-dom';
 import GameCanvas from 'components/GameCanvas';
@@ -27,7 +27,7 @@ const Room = () => {
       if (room == null) return history.push('/');
       window.room = room;
       setRoom(room);
-      
+
       room.onStateChange((newState) => {
         setRoomState(Object.assign({}, newState));
       });
@@ -51,26 +51,37 @@ const Room = () => {
 
   function readyUp() {
     setReady(!ready);
-    room.send('PLAYER_READY', { 
-      ready: !ready 
+    room.send('PLAYER_READY', {
+      ready: !ready,
     });
   }
 
   function sendChatMessage(message) {
-    message = message.trim()
-    if (!message) return
-    room.send('SEND_CHAT_MESSAGE', { 
-      message: message
+    message = message.trim();
+    if (!message) return;
+    room.send('SEND_CHAT_MESSAGE', {
+      message: message,
     });
     setChatMessage('');
+  }
+  function changeColor() {
+    room.send('CHANGE_COLOR');
   }
 
   // get list of players
   const players = Array.from(roomState?.players?.values?.() || []);
-  const length = players.length
+  const length = players.length;
   for (let i = 0; i < 4 - length; i++) {
-    players.push(null)
+    players.push(null);
   }
+
+  const tint = {
+    16776960: 'pacman-yellow',
+    0xff0000: 'pacman-red',
+    0x00ff00: 'pacman-green',
+    0x0000ff: 'pacman-blue',
+  };
+  console.log(players);
 
   return (
     <Container className='room'>
@@ -84,41 +95,40 @@ const Room = () => {
 
         <div className='game__player-list'>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman}/>
+            <img width='20' src={player_pacman} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman}/>
+            <img width='20' src={player_pacman} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman}/>
+            <img width='20' src={player_pacman} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman}/>
+            <img width='20' src={player_pacman} />
             <p>UberHaxor69</p>
           </div>
         </div>
-
       </div>
 
       {/* LOBBY */}
       <div className={`lobby ${(roomState?.gameStarted) && 'hidden'}`}>
         <div className='lobby__header'>
           <div className='room-id-desc'>
-            <p>Room ID:<br/>{room?.id}</p>
+            <p>
+              Room ID:
+              <br />
+              {room?.id}
+            </p>
           </div>
 
-          <img style={{ 'width': '70%' }}src={player_select_title}/>
+          <img style={{ width: '70%' }} src={player_select_title} />
 
           <div className='invite-url-desc'>
             <p>Invite URL</p>
-            <input 
-              type='text' 
-              value={window.location}
-              onClick={(e) => e.target.select()}
-            />
+            <input type='text' value={window.location} onClick={(e) => e.target.select()} />
           </div>
         </div>
 
@@ -130,41 +140,54 @@ const Room = () => {
                   <p>Open Slot</p>
                   <p className='player-card__subtitle'>Invite Players!</p>
                 </div>
-              )
-              
+              );
             } else {
-              const chatMessage = roomState?.chatMessages?.get?.(player.id)
+              const chatMessage = roomState?.chatMessages?.get?.(player.id);
 
               return (
-                <div className={`player-card ${(player.id === room?.sessionId) && 'player-card--is-player'}`} key={`p-${i}`}>
-                  <img style={{ 'margin': '1.4rem 0 0.6rem'}} src={player_pacman}/>
+                <div
+                  className={`player-card ${player.id === room?.sessionId && 'player-card--is-player'}`}
+                  key={`p-${i}`}
+                  onClick={player.id === room?.sessionId ? changeColor : null}
+                >
+                  <img style={{ margin: '1.4rem 0 0.6rem' }} src={player_pacman} className={tint[player.tint]} />
 
-                  <div style={{ 'position': 'relative' }}>
+                  <div style={{ position: 'relative' }}>
                     {chatMessage && <Tooltip placement='top'>{chatMessage}</Tooltip>}
                     <p>UberHaxor69</p>
                   </div>
 
                   <p>
-                    {(isRoomAdmin(player.id)) ? 
-                      <span><img style={{ 'margin': '0 0.3rem 2.5px 0'}} src={icon_crown}/>Host</span> :
-                      <span>{(player.ready) ? 'ready!' : 'not ready'}</span>
-                    }
+                    {isRoomAdmin(player.id) ? (
+                      <span>
+                        <img style={{ margin: '0 0.3rem 2.5px 0' }} src={icon_crown} />
+                        Host
+                      </span>
+                    ) : (
+                      <span>{player.ready ? 'ready!' : 'not ready'}</span>
+                    )}
                   </p>
                 </div>
-              )
+              );
             }
           })}
         </div>
 
         <div className='lobby__buttons'>
-          {(isRoomAdmin()) ?
-            <button className='ready-button' onClick={startGame} disabled={!roomState?.gameCanStart}>Start&thinsp;&thinsp;Game</button> :
-            <button className='ready-button' onClick={readyUp}>{(!ready) ? 'Ready' : 'Cancel'}</button>}
+          {isRoomAdmin() ? (
+            <button className='ready-button' onClick={startGame} disabled={!roomState?.gameCanStart}>
+              Start&thinsp;&thinsp;Game
+            </button>
+          ) : (
+            <button className='ready-button' onClick={readyUp}>
+              {!ready ? 'Ready' : 'Cancel'}
+            </button>
+          )}
 
           <div className='chat-box'>
-            <input 
-              type='text' 
-              value={chatMessage} 
+            <input
+              type='text'
+              value={chatMessage}
               placeholder='Send a message to other players...'
               onChange={(e) => setChatMessage(e.target.value)}
               onKeyDown={(e) => {

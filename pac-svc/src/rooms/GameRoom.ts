@@ -27,6 +27,7 @@ class GameRoom extends Room<GameState> {
     function mod(n, m) {
       return ((n % m) + m) % m;
     }
+    const tints = [0xffff00, 0xff0000, 0x00ff00, 0x0000ff];
     this.setState(new GameState());
     const playerCallbacks = {};
     const ghostCallbacks = {};
@@ -38,7 +39,6 @@ class GameRoom extends Room<GameState> {
 
       // check if game can start (all players are ready)
       const players = Array.from(this.state.players.values());
-
       let playersReady = 0;
       for (const player of players) {
         if (!this.isAdmin(player.client)) {
@@ -50,22 +50,27 @@ class GameRoom extends Room<GameState> {
     });
 
     this.onMessage('SEND_CHAT_MESSAGE', (client, message) => {
-      const timeout = this.messageTimeouts[client.id]
+      const timeout = this.messageTimeouts[client.id];
       if (timeout) clearTimeout(timeout);
-      
+
       this.state.chatMessages.set(client.id, message?.message);
 
       // set a timeout to clear out the message
       this.messageTimeouts[client.id] = setTimeout(() => {
         this.state.chatMessages.set(client.id, '');
       }, 7000);
-    })
+    });
 
     this.onMessage('START_GAME', (client) => {
       if (!this.state.gameCanStart || this.state.gameStarted) return;
       if (this.isAdmin(client)) {
         this.startGame();
       }
+    });
+
+    this.onMessage('CHANGE_COLOR', (client) => {
+      const player = this.state.players.get(client.id);
+      player.tint = tints[(tints.indexOf(player.tint) + 1) % tints.length];
     });
 
     /* game event listeners */
@@ -207,7 +212,7 @@ class GameRoom extends Room<GameState> {
 
   onJoin(client: Client): void {
     this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
-    
+
     if (this.state.players.size === 1) {
       this.state.adminId = client.id;
     }
@@ -215,9 +220,12 @@ class GameRoom extends Room<GameState> {
 
   async onLeave(client: Client): Promise<void> {
     const player = this.state.players.get(client.id);
+    const ghost = this.state.ghosts.get(client.id);
     const prevAdminId = this.state.adminId;
     this.state.players.delete(client.id);
-    this.state.ghosts.delete(client.id);
+    if (this.state.ghosts.get(client.id)) {
+      this.state.ghosts.delete(client.id);
+    }
 
     // assign a random player admin if admin leaves
     if (prevAdminId === client.id) {
@@ -227,10 +235,13 @@ class GameRoom extends Room<GameState> {
 
     try {
       if (this.state.gameStarted) return;
-      
+
       // allow disconnected client to reconnect into this room until 10 seconds
       await this.allowReconnection(client, 10);
       this.state.players.set(client.id, player);
+      if (ghost) {
+        this.state.ghosts.set(client.id, ghost);
+      }
 
       // reinstate admin previleges
       if (prevAdminId === client.id) {
