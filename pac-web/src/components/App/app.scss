@@ -32,7 +32,7 @@ img {
 /* bootstrap overrides */
 .container {
 	width: 1024px;
-	padding: calc(1rem + 2vh) 2rem 5rem;
+	padding: calc(1rem + 4vh) 2rem 5rem;
 	max-width: 100%;
 	background: #1F2136;
 	border-radius: 0 0 4px 4px;
@@ -57,7 +57,39 @@ img {
 	&:focus {
 		box-shadow: 0 0 0 0.2rem rgba(#0043ff, 0.2);
 	}
-} 
+}
+
+.table {
+	margin: auto;
+	max-width: 700px;
+	color: white;
+
+	thead {
+		th {
+			width: 30%;
+			font-family: 'Press Start 2P', monospace;
+			font-weight: normal; 
+			background: #010101;
+			border: none;
+			padding: 1rem 1.5rem;
+		}
+	}
+
+	tbody {
+		tr {
+			background: #141629;
+			td, th { 
+				padding: 0.8rem 1.5rem;
+				border: none;
+			}
+	
+			th { 
+				font-weight: normal; 
+				text-transform: uppercase;
+			}
+		}
+	}
+}
 
 /* helper utility classes */
 .uppercase {

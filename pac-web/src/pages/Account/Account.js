@@ -7,7 +7,7 @@ const Account = () => {
   return(
     <Container>
       <table className='table table-striped account-table'>
-        <thead className='thead-dark'>
+        <thead>
           <th scope='col'>PROFILE</th>
           <th scope='col'></th>
         </thead>

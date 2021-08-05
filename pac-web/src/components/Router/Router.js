@@ -2,7 +2,6 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import Home from 'pages/Home';
-import Login from 'pages/Login';
 import Room from 'pages/Room';
 import Account from 'pages/Account';
 import AccountStats from 'pages/AccountStats';

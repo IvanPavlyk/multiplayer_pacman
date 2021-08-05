@@ -5,10 +5,11 @@ const GlobalStats = () => {
   return(
     <Container>
       <table className='table table-striped account-table'>
-        <thead className='thead-dark'>
-          <th scope='col'>GLOBAL STATS</th>
+        <thead>
+          <th scope='col'>GLOBAL<br/>STATS</th>
           <th scope='col'></th>
         </thead>
+
         <tbody>
           <tr>
             <th scope='row'>All pellets eaten</th>
@@ -20,7 +21,8 @@ const GlobalStats = () => {
           </tr>
         </tbody>
       </table>
-    </Container>);
+    </Container>
+  );
 };
 
 export default GlobalStats;

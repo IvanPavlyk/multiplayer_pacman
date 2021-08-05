@@ -117,7 +117,7 @@ const Room = () => {
             </p>
           </div>
 
-          <img style={{ width: '70%' }} src={player_select_title} />
+          <img style={{ width: '75%' }} src={player_select_title} />
 
           <div className='invite-url-desc'>
             <p>Invite URL</p>

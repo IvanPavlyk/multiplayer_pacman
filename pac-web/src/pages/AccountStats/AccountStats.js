@@ -1,35 +1,39 @@
 import React from 'react';
-import { Accordion, Card, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+
+import './account-stats.scss';
 
 const AccountStats = () => {
   return(
-    <div className='container account-stats-accordian'>
-      <Accordion defaultActiveKey='0'>
-        <Card>
-          <Card.Header className='custom-card-header'>
-            <Accordion.Toggle as={Button} variant='link' eventKey='0'>
-                GAME 1 - WIN
-            </Accordion.Toggle>
-          </Card.Header>
+    <Container>
+      <table className='table table-striped account-table'>
+        <thead>
+          <th scope='col'>YOUR MATCH HISTORY</th>
+          <th scope='col'></th>
+          <th scope='col'></th>
+        </thead>
 
-          <Accordion.Collapse eventKey='0'>
-            <Card.Body className='card-body'>
-              <table className='table table-striped'>
-                <tbody>
-                  <tr>
-                    <th scope='row'>PLAYERS</th>
-                    <td>TheLegend42, Bob, Dave, Jeff</td>
-                  </tr>
-                  <tr>
-                    <th scope='row'>SCORE</th>
-                    <td>1,500</td>
-                  </tr>
-                </tbody>
-              </table></Card.Body>
-          </Accordion.Collapse>
-        </Card>
-      </Accordion>
-    </div>);
+        <thead className='stats-header'>
+          <th scope='col'>Result</th>
+          <th scope='col'>Score</th>
+          <th scope='col'>Date</th>
+        </thead>
+
+        <tbody>
+          <tr>
+            <th scope='row'>Win</th>
+            <td>413,424</td>
+            <td>8/5/21</td>
+          </tr>
+          <tr>
+            <th scope='row'>Lose</th>
+            <td>10,050</td>
+            <td>8/5/21</td>
+          </tr>
+        </tbody>
+      </table>
+    </Container>
+  );
 };
 
 export default AccountStats;
