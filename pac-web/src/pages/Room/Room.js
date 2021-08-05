@@ -95,6 +95,7 @@ const Room = () => {
             return (
               <div 
                 className={`player-card player-card--mini ${player.id === room?.sessionId && 'player-card--is-player'}`} 
+                style={{'--select-color' : player.tint}}
                 key={`p1-${i}`}
               >
                 <PacmanIcon width='20' color={player.tint} />

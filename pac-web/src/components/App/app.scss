@@ -44,6 +44,21 @@ img {
 		-7px 0 0 darken(#1F2136, 5);
 }
 
+.btn-primary {
+	color: #fff;
+  background-color: #0043ff;
+  border-color: #0043ff;
+
+	&:hover, &:focus {
+		background-color: darken(#0043ff, 10);
+		border-color: darken(#0043ff, 10);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 0.2rem rgba(#0043ff, 0.2);
+	}
+} 
+
 /* helper utility classes */
 .uppercase {
 	text-transform: uppercase;

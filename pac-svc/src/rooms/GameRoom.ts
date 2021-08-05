@@ -250,7 +250,7 @@ class GameRoom extends Room<GameState> {
         this.state.adminId = client.id;
       }
 
-    } catch (err) {
+    } catch(err) {
       // delete players
       this.state.players.delete(client.id);
       this.state.ghosts.delete(client.id);
