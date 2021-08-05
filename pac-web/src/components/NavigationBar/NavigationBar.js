@@ -19,7 +19,7 @@ const NavigationBar = ( {children} ) => {
   };
 
   const getNavigationBar = () => {
-    if(location.pathname !== '/') {
+    if(location.pathname !== '/' && location.pathname !=='/new-account') {
       return (<div>
         <Navbar bg='dark'>
           <Navbar.Brand href='/home'>
