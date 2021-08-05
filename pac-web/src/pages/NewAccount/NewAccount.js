@@ -37,8 +37,7 @@ const NewAccount = () => {
     <Container>
       <Form onSubmit={newAccountHandler}>
         <Form.Group className='mb-3' controlId='formBasicEmail'>
-          <Form.Label>PLAYER NAME</Form.Label>
-          <Form.Control type='text' onChange={handleChange}/>
+          <Form.Control type='text' onChange={handleChange} placeholder='USERNAME'/>
         </Form.Group>
         <Button variant='primary' type='submit'>Submit</Button>
       </Form>

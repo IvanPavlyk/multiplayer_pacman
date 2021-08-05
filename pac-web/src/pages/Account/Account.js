@@ -4,7 +4,6 @@ import Container from 'react-bootstrap/Container';
 
 import './account.scss';
 
-
 const Account = () => {
   const [profile, setProfile] = useState({});
 

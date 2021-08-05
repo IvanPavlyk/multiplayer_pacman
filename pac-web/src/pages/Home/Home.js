@@ -47,13 +47,14 @@ const Home = () => {
         </Row>
       </div>
 
-      {/* <Row className='justify-content-center'>
+      <Row className='justify-content-center'>
         <GoogleLogout
           clientId={clientId}
           buttonText='Logout'
           onLogoutSuccess={logoutSuccess}
+          className='mt-4'
         />
-      </Row> */}
+      </Row>
     </Container>
   );
 };

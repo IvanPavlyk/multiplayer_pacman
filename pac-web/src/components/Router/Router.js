@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 import Home from 'pages/Home';
 import Room from 'pages/Room';
@@ -17,7 +17,7 @@ const Router = () => {
       <NavigationBar>
         <Switch>
           <Route path='/' exact component={Login}/>
-          <PrivateRoute path='/new-account' component={NewAccount}/>
+          <Route path='/new-account' component={NewAccount}/>
           <PrivateRoute path='/home' component={Home}/>
           <PrivateRoute path='/room/:id' component={Room}/>
           <PrivateRoute path='/account' component={Account}/>

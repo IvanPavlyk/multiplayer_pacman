@@ -44,9 +44,6 @@ const Login = () => {
   return (
     <Container>
       <Row className='justify-content-center'>
-        <img src='/logo512.png'></img>
-      </Row>
-      <Row className='justify-content-center'>
         <GoogleLogin 
           clientId={clientId}
           buttonText='Log in with Google'
