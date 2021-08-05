@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import ColyseusClient from 'components/ColyseusClient'; 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './app.scss'
-import './fonts.scss'
+import './app.scss';
+import './fonts.scss';
 
 function App() {
   return (
