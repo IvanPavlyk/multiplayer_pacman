@@ -8,8 +8,9 @@ import { createServer } from 'http';
 import { v4 as uuidv4 } from 'uuid';
 import GameRoom from './rooms/GameRoom';
 
-const port = Number(process.env.port) || 8080;
+const port = Number(process.env.PORT) || 8080;
 const app = express();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 dotenv.config();
 
 app.set('port', 3002);
@@ -21,7 +22,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-//TODO: add username field
 app.post('/add-user', async (req, res) => {
   const { username, email } = req.body;
   const query = 'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
@@ -44,16 +44,27 @@ app.post('/auth/user-exists', async (req, res) => {
   try {
     const response = await pool.query(query, [email]);
     res.send(response);
-    
+
   } catch (error) {
     res.send(error);
   }
 });
 
-app.get('/auth/user-is-authenticated/:tokenID', (req, res) => {
+app.get('/auth/user-is-authenticated/:tokenID', async (req, res) => {
   console.log(req.params.tokenID);
-  //TODO: finish this
-  res.send('Received');
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: req.params.tokenID,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    console.log('Payload: ', payload);
+    res.send(true);
+  } catch (e) {
+    console.log(e);
+    res.send(false);
+  }
+
 });
 
 app.get('/globalStats', async (req, res) => {
@@ -110,6 +121,18 @@ app.get('/match-history/:userId', async (req, res) => {
   } catch (err) {
     console.error(err.stack);
     res.status(404).send({ error: err });
+  }
+});
+
+app.get('/account/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const query = 'SELECT * FROM pacman."User" WHERE "id" = $1';
+
+  try {
+    const response = await pool.query(query, [userId]);
+    res.send(response.rows);
+  } catch (err) {
+    console.error(err);
   }
 });
 

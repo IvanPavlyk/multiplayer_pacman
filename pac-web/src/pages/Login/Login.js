@@ -51,7 +51,6 @@ const Login = () => {
           buttonText='Log in with Google'
           onSuccess={onLoginSuccess}
           onFailure={onLoginFailure}
-          // isSignedIn={true}
           cookiePolicy={'single_host_origin'}
         />
       </Row>
