@@ -11,8 +11,6 @@ const NewAccount = () => {
     location.state.detail
   );
 
-  console.log(accountInfo);
-
   const handleChange = (event) => {
     setAccountInfo(
       {...accountInfo,
@@ -25,7 +23,6 @@ const NewAccount = () => {
     event.preventDefault();
     axios.post('http://localhost:3002/add-user', accountInfo) //TODO: push url to enviornment variable or helper function
       .then( res => {
-        console.log(res);
         history.push('/home');
       })
       .catch ( error => {

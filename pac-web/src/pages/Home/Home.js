@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import { GoogleLogout } from 'react-google-login';
@@ -25,6 +25,7 @@ const Home = () => {
   };
 
   const logoutSuccess = () => {
+    sessionStorage.removeItem('isAuthenticated');
     history.push('/');
   };
 
@@ -52,7 +53,7 @@ const Home = () => {
           clientId={clientId}
           buttonText='Logout'
           onLogoutSuccess={logoutSuccess}
-          className='mt-4'
+          className='mt-5'
         />
       </Row>
     </Container>

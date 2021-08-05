@@ -11,7 +11,6 @@ const AccountStats = () => {
     const id = sessionStorage.getItem('id');
     axios.get(`http://localhost:3002/match-history/${id}`)
       .then( res => {
-        console.log(res);
         setMatches(res.data);
       });
   }, []);
