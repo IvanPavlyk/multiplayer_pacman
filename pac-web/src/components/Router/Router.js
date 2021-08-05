@@ -9,6 +9,7 @@ import MatchHistory from 'pages/MatchHistory';
 import NavigationBar from 'components/NavigationBar';
 import GlobalStats from 'pages/GlobalStats';
 import NewAccount from 'pages/NewAccount';
+import PrivateRoute from 'components/PrivateRoute';
 
 const Router = () => {
   return (
@@ -16,12 +17,12 @@ const Router = () => {
       <NavigationBar>
         <Switch>
           <Route path='/' exact component={Login}/>
-          <Route path='/home' exact component={Home}/>
-          <Route path='/room/:id' component={Room}/>
-          <Route path='/account' component={Account}/>
-          <Route path='/new-account' component={NewAccount}/>
-          <Route path='/stats/account' component={MatchHistory}/>
-          <Route path='/stats/global' component={GlobalStats}/>
+          <PrivateRoute exact path='/home' component={Home}/>
+          <PrivateRoute path='/room/:id' component={Room}/>
+          <PrivateRoute path='/account' component={Account}/>
+          <PrivateRoute path='/new-account' component={NewAccount}/>
+          <PrivateRoute path='/stats/account' component={MatchHistory}/>
+          <PrivateRoute path='/stats/global' component={GlobalStats}/>
         </Switch>
       </NavigationBar>
     </main>
