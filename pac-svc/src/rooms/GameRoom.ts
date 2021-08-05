@@ -2,6 +2,8 @@ import { Room, Client } from 'colyseus';
 import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
+import { CANCELLED } from 'dns';
+import PowerUp from '../schema/PowerUp';
 
 class GameRoom extends Room<GameState> {
   maxClients = 4;
@@ -23,9 +25,13 @@ class GameRoom extends Room<GameState> {
       return ((n % m) + m) % m;
     }
     const tints = [0xffff00, 0xff0000, 0x00ff00, 0x0000ff];
+    const colors = ['yellow', 'red', 'green', 'blue'];
+    const powerUps = ['superSpeed', 'sizeIncrease', 'freezeAoe'];
+    const powerUpDict = {'superSpeed' : 3, 'sizeIncrease' : 5, 'freezeAoe' : 4};
     this.setState(new GameState());
     const playerCallbacks = {};
     const ghostCallbacks = {};
+    let powerUpCallbacks = undefined;
 
     /* lobby event listeners */
     this.onMessage('PLAYER_READY', (client, message) => {
@@ -65,7 +71,20 @@ class GameRoom extends Room<GameState> {
 
     this.onMessage('CHANGE_COLOR', (client) => {
       const player = this.state.players.get(client.id);
+      const ghost = this.state.ghosts.get(client.id);
       player.tint = tints[(tints.indexOf(player.tint) + 1) % tints.length];
+      ghost.color = colors[(colors.indexOf(ghost.color) + 1) % colors.length];
+    });
+    
+    this.onMessage('GHOST_PLAYER_COLLISION', (client, message) => {
+      const player = this.state.players.get(message.id);
+      if(player && player.alive){
+        const ghost = this.state.ghosts.get(message.id);
+        clearInterval(playerCallbacks[message.id]);
+        clearInterval(ghostCallbacks[message.id]);
+        player.alive = false;
+        ghost.alive = false;
+      }
     });
 
     /* game event listeners */
@@ -77,6 +96,25 @@ class GameRoom extends Room<GameState> {
         message.pellets.forEach((ele) => {
           this.state.pellets.push(ele);
         });
+      }
+      if (!powerUpCallbacks) {
+        powerUpCallbacks = setInterval(()=>{
+          for(var x = this.state.powerUps.length - 1; x >= 0; x--){
+            if(this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()){
+              this.state.powerUps.splice(x, 1);
+            }
+          }
+          if(this.state.powerUps.length >= 10){
+            return;
+          }
+          let tempX, tempY; 
+          do{
+            tempX = Math.floor(Math.random()*this.state.width);
+            tempY = Math.floor(Math.random()*this.state.height);
+          } while(this.state.walls[tempX + tempY*this.state.width] || this.state.powerUps.some((e)=> e.x === tempX && e.y === tempY));
+          let randomPowerUp = Math.floor(Math.random()*powerUps.length);
+          this.state.powerUps.push(new PowerUp({x : tempX, y : tempY, name: powerUps[randomPowerUp]}));
+        }, 1000);
       }
       if (!this.state.walls.length) {
         message.walls.forEach((ele) => {
@@ -91,7 +129,7 @@ class GameRoom extends Room<GameState> {
       }
       //Setting up ghost movement
       if (!(client.id in ghostCallbacks)) {
-        this.state.ghosts.set(client.id, new Ghost({ x: 11 * 32 + 16, y: 8 * 32 + 16 }));
+        
         const ghost = this.state.ghosts.get(client.id);
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
         const state = this.state;
@@ -166,6 +204,14 @@ class GameRoom extends Room<GameState> {
               state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width] = 0;
               player.pelletsEaten += 1;
             }
+            let powerUpIndex = this.state.powerUps.findIndex((powerUp)=> Math.floor(player.x/32) === powerUp.x && Math.floor(player.y/32) === powerUp.y);
+            if(powerUpIndex !== -1){
+              this.state.powerUps[powerUpIndex].startTime = Date.now();
+              this.state.powerUps[powerUpIndex].endTime = this.state.powerUps[powerUpIndex].startTime + powerUpDict[this.state.powerUps[powerUpIndex].name];
+              this.state.powerUps[powerUpIndex].id = player.id;
+              this.state.powerUps[powerUpIndex].x = -100;
+              this.state.powerUps[powerUpIndex].y = -100;
+            }
             let walls = ['up', 'down', 'right', 'left'];
             walls = walls.filter(function (value) {
               if (
@@ -207,7 +253,7 @@ class GameRoom extends Room<GameState> {
 
   onJoin(client: Client): void {
     this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
-
+    this.state.ghosts.set(client.id, new Ghost({ x: 11 * 32 + 16, y: 8 * 32 + 16 }));
     if (this.state.players.size === 1) {
       this.state.adminId = client.id;
     }

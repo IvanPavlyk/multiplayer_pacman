@@ -7,6 +7,7 @@ class Player extends Schema {
   @type('string') queuedDirection = 'right';
   @type('number') x = 0;
   @type('number') y = 0;
+  @type('boolean') alive = true;
   @type('number') velocity = 3;
   @type('number') pelletsEaten = 0;
   @type('number') tint = 0xffff00;

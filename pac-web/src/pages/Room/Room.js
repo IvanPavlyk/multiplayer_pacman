@@ -81,8 +81,6 @@ const Room = () => {
     0x00ff00: 'pacman-green',
     0x0000ff: 'pacman-blue',
   };
-  console.log(players);
-
   return (
     <Container className='room'>
       {/* GAME */}

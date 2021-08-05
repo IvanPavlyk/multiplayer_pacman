@@ -3,6 +3,8 @@ import { type, Schema } from '@colyseus/schema';
 class Ghost extends Schema {
   @type('string') direction = 'right';
   @type('string') queuedDirection = 'right';
+  @type('string') color = 'yellow';
+  @type('boolean') alive = true;
   @type('number') x = 0;
   @type('number') y = 0;
 
