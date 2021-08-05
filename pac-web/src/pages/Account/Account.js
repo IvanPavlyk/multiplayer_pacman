@@ -1,8 +1,20 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import './style.css';
 
+
 const Account = () => {
+  const [profile, setProfile] = useState({});
+
+  useEffect( () => {
+    const id = sessionStorage.getItem('id');
+    axios.get(`http://localhost:3002/account/${id}`)
+      .then( res => {
+        setProfile(res.data[0]);
+      });
+  }, []);
+
   return(
     <Container>
       <table className='table table-striped account-table'>
@@ -13,15 +25,11 @@ const Account = () => {
         <tbody>
           <tr>
             <th scope='row'>USERNAME</th>
-            <td>TheLegend42</td>
-          </tr>
-          <tr>
-            <th scope='row'>NAME</th>
-            <td>Mark John</td>
+            <td>{profile.username}</td>
           </tr>
           <tr>
             <th scope='row'>EMAIL</th>
-            <td>email@email.com</td>
+            <td>{profile.email}</td>
           </tr>
         </tbody>
       </table>
