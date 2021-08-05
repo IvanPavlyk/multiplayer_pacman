@@ -4,22 +4,17 @@ import { BrowserRouter } from 'react-router-dom';
 import ColyseusClient from 'components/ColyseusClient'; 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './app.scss'
-import './fonts.scss'
+import './app.scss';
+import './fonts.scss';
 
 function App() {
   return (
     <div className='App'>
-      <div style={{
-        height: '100%',
-        backgroundImage: 'url(/background.png)',
-      }} >
-        <ColyseusClient>
-          <BrowserRouter>
-            <Router/>
-          </BrowserRouter>
-        </ColyseusClient>
-      </div>
+      <ColyseusClient>
+        <BrowserRouter>
+          <Router/>
+        </BrowserRouter>
+      </ColyseusClient>
     </div>
   );
 }

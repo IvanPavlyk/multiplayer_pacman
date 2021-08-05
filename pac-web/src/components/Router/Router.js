@@ -8,7 +8,6 @@ import Account from 'pages/Account';
 import AccountStats from 'pages/AccountStats';
 import NavigationBar from 'components/NavigationBar';
 import GlobalStats from 'pages/GlobalStats';
-import PrivateRoute from 'components/PrivateRoute';
 import NewAccount from 'pages/NewAccount';
 
 const Router = () => {
@@ -19,7 +18,7 @@ const Router = () => {
           <Route path='/' exact component={Login}/>
           <Route path='/home' exact component={Home}/>
           <Route path='/room/:id' component={Room}/>
-          <PrivateRoute path='/account' component={Account}/>
+          <Route path='/account' component={Account}/>
           <Route path='/new-account' component={NewAccount}/>
           <Route path='/stats/account' component={AccountStats}/>
           <Route path='/stats/global' component={GlobalStats}/>

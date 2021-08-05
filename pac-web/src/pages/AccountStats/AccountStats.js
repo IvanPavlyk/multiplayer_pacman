@@ -1,8 +1,6 @@
 import React from 'react';
 import { Accordion, Card, Button } from 'react-bootstrap';
 
-import './style.css';
-
 const AccountStats = () => {
   return(
     <div className='container account-stats-accordian'>

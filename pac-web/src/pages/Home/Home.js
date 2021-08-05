@@ -3,8 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import { GoogleLogout } from 'react-google-login';
 
-
-
 const Home = () => {
   const [id, setValue] = useState('');
   const history = useHistory();
