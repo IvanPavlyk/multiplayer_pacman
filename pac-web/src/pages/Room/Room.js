@@ -101,7 +101,7 @@ const Room = () => {
                 <PacmanIcon width='20' color={player.tint} />
                 <p>UberHaxor69</p>
               </div>
-            )
+            );
           })}
         </div>
       </div>

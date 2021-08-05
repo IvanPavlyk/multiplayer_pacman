@@ -1,5 +1,4 @@
 import { type, Schema } from '@colyseus/schema';
-import Player from './Player';
 
 class PowerUp extends Schema {
   @type('string') name = '';
@@ -10,7 +9,7 @@ class PowerUp extends Schema {
   @type('number') endTime = 0;
   @type('string') id = undefined;
 
-  constructor({ x, y, name}: { x: number; y: number; name: string}) {
+  constructor({ x, y, name }: { x: number; y: number; name: string}) {
     super();
     this.x = x;
     this.y = y;

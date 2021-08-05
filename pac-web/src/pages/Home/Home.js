@@ -4,7 +4,7 @@ import { Button, Container, Row } from 'react-bootstrap';
 import { GoogleLogout } from 'react-google-login';
 import { useColyseus } from 'components/ColyseusClient';
 
-import './home.scss'
+import './home.scss';
 
 import title_logo from 'assets/images/title-logo.png';
 
@@ -21,7 +21,7 @@ const Home = () => {
 
   const joinRoom = (id) => {
     if (id)
-    history.push(`/room/${id}`);
+      history.push(`/room/${id}`);
   };
 
   const logoutSuccess = () => {

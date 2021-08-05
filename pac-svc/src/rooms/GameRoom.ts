@@ -2,13 +2,11 @@ import { Room, Client } from 'colyseus';
 import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
-import { error } from 'console';
+import PowerUp from '../schema/PowerUp';
 
 function mod(n, m) {
   return ((n % m) + m) % m;
 }
-import { CANCELLED } from 'dns';
-import PowerUp from '../schema/PowerUp';
 
 class GameRoom extends Room<GameState> {
   maxClients = 4;
@@ -26,7 +24,7 @@ class GameRoom extends Room<GameState> {
     this.lock();
   }
 
-  broadcastGameAlert(message: string) {
+  broadcastGameAlert(message: string): void {
     this.state.gameAlertMessage = message;
   }
 
@@ -110,7 +108,7 @@ class GameRoom extends Room<GameState> {
       }
       if (!powerUpCallbacks) {
         powerUpCallbacks = setInterval(()=>{
-          for(var x = this.state.powerUps.length - 1; x >= 0; x--){
+          for(let x = this.state.powerUps.length - 1; x >= 0; x--){
             if(this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()){
               this.state.powerUps.splice(x, 1);
             }
@@ -123,7 +121,7 @@ class GameRoom extends Room<GameState> {
             tempX = Math.floor(Math.random()*this.state.width);
             tempY = Math.floor(Math.random()*this.state.height);
           } while(this.state.walls[tempX + tempY*this.state.width] || this.state.powerUps.some((e)=> e.x === tempX && e.y === tempY));
-          let randomPowerUp = Math.floor(Math.random()*powerUps.length);
+          const randomPowerUp = Math.floor(Math.random()*powerUps.length);
           this.state.powerUps.push(new PowerUp({x : tempX, y : tempY, name: powerUps[randomPowerUp]}));
         }, 1000);
       }
@@ -215,7 +213,7 @@ class GameRoom extends Room<GameState> {
               state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width] = 0;
               player.pelletsEaten += 1;
             }
-            let powerUpIndex = this.state.powerUps.findIndex((powerUp)=> Math.floor(player.x/32) === powerUp.x && Math.floor(player.y/32) === powerUp.y);
+            const powerUpIndex = this.state.powerUps.findIndex((powerUp)=> Math.floor(player.x/32) === powerUp.x && Math.floor(player.y/32) === powerUp.y);
             if(powerUpIndex !== -1){
               this.state.powerUps[powerUpIndex].startTime = Date.now();
               this.state.powerUps[powerUpIndex].endTime = this.state.powerUps[powerUpIndex].startTime + powerUpDict[this.state.powerUps[powerUpIndex].name];

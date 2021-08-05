@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import Phaser from 'phaser';
 import { IonPhaser } from '@ion-phaser/react';
 import { MainScene } from './scenes/main';

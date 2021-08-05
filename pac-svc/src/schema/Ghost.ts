@@ -12,7 +12,7 @@ class Ghost extends Schema {
     super();
 
     const COLORS = ['yellow', 'red', 'green', 'blue'];
-    this.color = COLORS[Math.floor(Math.random() * COLORS.length)]
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
   }
 }
 
