@@ -13,17 +13,15 @@ import NewAccount from 'pages/NewAccount';
 const Router = () => {
   return (
     <main>
-      <NavigationBar>
-        <Switch>
-          <Route path='/' exact component={Login}/>
-          <Route path='/home' exact component={Home}/>
-          <Route path='/room/:id' component={Room}/>
-          <Route path='/account' component={Account}/>
-          <Route path='/new-account' component={NewAccount}/>
-          <Route path='/stats/account' component={AccountStats}/>
-          <Route path='/stats/global' component={GlobalStats}/>
-        </Switch>
-      </NavigationBar>
+      <NavigationBar/>
+      <Switch>
+        <Route path='/' exact component={Home}/>
+        <Route path='/room/:id' component={Room}/>
+        <Route path='/account' component={Account}/>
+        <Route path='/new-account' component={NewAccount}/>
+        <Route path='/stats/account' component={AccountStats}/>
+        <Route path='/stats/global' component={GlobalStats}/>
+      </Switch>
     </main>
   );
 };

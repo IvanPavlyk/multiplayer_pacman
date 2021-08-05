@@ -37,6 +37,10 @@ client.joinRoomById = async function(id) {
   return room;
 };
 
+client.clearSession = function() {
+  sessionStorage.setItem('sessionId', null);
+}
+
 /* helper hook */
 export const useColyseus = () => {
   return client;

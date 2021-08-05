@@ -2,12 +2,16 @@
   min-height: auto !important;
   display: grid;
   justify-content: center;
-  padding: 15vh 0 3rem;
+  padding: calc(1rem + 7vh) 0 5rem;
 }
 
 .game {
 	text-align: center;
 	background: #010101;
+  box-shadow: 
+    -300px 0 0 #010101, 
+    300px 0 0 #010101;
+  padding: 0 1.2rem;
 
 	canvas {
 		width: 40vw;
@@ -17,14 +21,15 @@
 
 	&__alert {
 		font-family: 'Press Start 2P', monospace;
-		font-size: 0.8rem;
+		font-size: 0.7rem;
 		color: white;
-		padding: 1.2rem 1rem 1rem;
+		padding: 1.4rem 1rem 1.2rem;
 	}
 
 	&__player-list {
-		padding: 1.5rem 1rem 1rem;
+		padding: 1.2rem 0 1rem;
 		display: flex;
+    justify-content: center;
 		gap: 1rem;
 	}
 }

@@ -2,6 +2,7 @@ import { Room, Client } from 'colyseus';
 import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
+import { error } from 'console';
 
 function mod(n, m) {
   return ((n % m) + m) % m;
@@ -75,6 +76,10 @@ class GameRoom extends Room<GameState> {
       if (this.isAdmin(client)) {
         this.startGame();
       }
+    });
+
+    this.onMessage('LEAVE_MATCH', (client) => {
+      client.leave();
     });
 
     /* game event listeners */
@@ -231,33 +236,30 @@ class GameRoom extends Room<GameState> {
     const player = this.state.players.get(client.id);
     const ghost = this.state.ghosts.get(client.id);
     const prevAdminId = this.state.adminId;
-    this.state.players.delete(client.id);
-    if (this.state.ghosts.get(client.id)) {
-      this.state.ghosts.delete(client.id);
-    }
-
-    // assign a random player admin if admin leaves
-    if (prevAdminId === client.id) {
-      const playerIds = Array.from(this.state.players.keys());
-      this.state.adminId = playerIds.shift();
-    }
-
+    
     try {
-      if (this.state.gameStarted) return;
+      if (this.state.gameStarted) throw 'Cannot reconnect when game is in-progress';
 
-      // allow disconnected client to reconnect into this room until 10 seconds
-      await this.allowReconnection(client, 10);
+      // allow disconnected client to reconnect into this room until 5 seconds
+      await this.allowReconnection(client, 5000);
       this.state.players.set(client.id, player);
-      if (ghost) {
-        this.state.ghosts.set(client.id, ghost);
-      }
+      this.state.ghosts.set(client.id, ghost);
 
       // reinstate admin previleges
       if (prevAdminId === client.id) {
         this.state.adminId = client.id;
       }
+
     } catch (err) {
-      console.log(err);
+      // delete players
+      this.state.players.delete(client.id);
+      this.state.ghosts.delete(client.id);
+
+      // assign a random player admin if admin leaves
+      if (prevAdminId === client.id) {
+        const playerIds = Array.from(this.state.players.keys());
+        this.state.adminId = playerIds.shift();
+      }
     }
   }
 }

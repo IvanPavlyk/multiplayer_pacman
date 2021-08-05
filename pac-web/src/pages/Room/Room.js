@@ -22,8 +22,10 @@ const Room = () => {
   const [chatMessage, setChatMessage] = useState('');
 
   useEffect(() => {
+    let room = null;
+
     (async () => {
-      const room = window.room || (await client.joinRoomById(id));
+      room = window.room || (await client.joinRoomById(id));
       if (room == null) return history.push('/');
       window.room = room;
       setRoom(room);
@@ -87,23 +89,19 @@ const Room = () => {
         {gameInstance}
 
         <div className='game__player-list'>
-          <div className='player-card player-card--mini'>
-            <PacmanIcon width='20' color={'red'} />
-            <p>UberHaxor69</p>
-          </div>
-          <div className='player-card player-card--mini'>
-            <PacmanIcon width='20' color={'red'} />
-            <p>UberHaxor69</p>
-          </div>
-          <div className='player-card player-card--mini'>
-            <PacmanIcon width='20' color={'red'} />
-            <p>UberHaxor69</p>
-          </div>
-          <div className='player-card player-card--mini'>
-            <PacmanIcon width='20' color={'red'} />
-            <p>UberHaxor69</p>
-          </div>
+          {(roomState?.gameStarted) && players.map((player, i) => {
+            if (player == null) return;
 
+            return (
+              <div 
+                className={`player-card player-card--mini ${player.id === room?.sessionId && 'player-card--is-player'}`} 
+                key={`p1-${i}`}
+              >
+                <PacmanIcon width='20' color={player.tint} />
+                <p>UberHaxor69</p>
+              </div>
+            )
+          })}
         </div>
       </div>
 

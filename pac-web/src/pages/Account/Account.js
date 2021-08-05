@@ -1,6 +1,7 @@
 import React from 'react';
 import Container from 'react-bootstrap/Container';
-import './style.css';
+
+import './account.scss';
 
 const Account = () => {
   return(

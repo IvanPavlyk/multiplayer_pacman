@@ -1,0 +1,35 @@
+.main-nav {
+	
+	// bootstrap override
+	.container {
+		background: #010101;
+		box-shadow: none;
+		padding: 0.8rem 0;
+	}
+	
+	.list-group {
+		gap: 1.1rem;
+		align-items: center;
+	}
+	
+	.nav-link { padding: 0; color: white; }
+	
+	&__container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		color: white;
+		position: relative;
+
+		&, button {
+			font-size: 0.9rem;
+			text-transform: uppercase;
+		}
+	}
+
+	&__logo {
+		position: absolute;
+		top: 50%; left: 50%;
+		transform: translate(-50%, -50%);
+	}
+}

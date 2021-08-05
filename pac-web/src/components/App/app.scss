@@ -25,11 +25,15 @@ p {
 	margin: 0;
 }
 
+img {
+	image-rendering: pixelated;
+}
+
 /* bootstrap overrides */
 .container {
 	width: 1024px;
+	padding: calc(1rem + 2vh) 2rem 5rem;
 	max-width: 100%;
-	min-height: 100vh;
 	background: #1F2136;
 	border-radius: 0 0 4px 4px;
 
