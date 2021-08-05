@@ -70,7 +70,7 @@ app.get('/globalStats', async (req, res) => {
     res.send(response.rows);
   } catch (error) {
     console.error(error.stack);
-    res.status(404).send({ error: 'Not found' });
+    res.status(404).send(error.stack);
   }
 });
 
@@ -95,7 +95,7 @@ app.post('/match-history', async (req, res) => {
     res.send(response);
   } catch (err) {
     console.error(err.stack);
-    res.status(404).send({ error: 'Missing params' });
+    res.status(404).send(err.stack);
   }
 });
 
@@ -109,7 +109,7 @@ app.get('/match-history/:userId', async (req, res) => {
     res.send(response.rows);
   } catch (err) {
     console.error(err.stack);
-    res.status(404).send({ error: err });
+    res.status(404).send(err.stack);
   }
 });
 
