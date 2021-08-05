@@ -15,18 +15,8 @@ const Login = () => {
       name: profile.name,
       email: profile.email
     };
-    console.log(user);
+    console.log(response);
 
-    // axios.post('http://localhost:3002/add-user', user) //TODO: push url to enviornment variable or helper function
-    //   .then( res => {
-    //     console.log(res);
-    //     history.push('/home'); //TODO: push to create account page
-    //   })
-    //   .catch ( error => {
-    //     console.error(error);
-    //   });
-
-    //TODO: check if user already has a profile else push to add user
     axios.post('http://localhost:3002/auth/user-exists', user)
       .then (res => {
         console.log(res);
@@ -34,7 +24,10 @@ const Login = () => {
           console.log('account exists');
           history.push('/home');
         } else {
-          history.push('/account/new-account');
+          history.push({
+            pathname:'/account/new-account',
+            state: {googleUserProfile: user}
+          });
         }
       })
       .catch (error => {

@@ -20,6 +20,7 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
+//TODO: add username field
 app.post('/add-user', async (req, res) => {
     const { name, email } = req.body;
     const template = `INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)`;

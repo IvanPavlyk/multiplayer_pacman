@@ -20,7 +20,7 @@ const Router = () => {
           <Route path='/home' exact component={Home}/>
           <Route path='/room/:id' component={Room}/>
           <PrivateRoute path='/account' component={Account}/>
-          <Route path='/account/new-account' component={NewAccount}/>
+          <Route path='/new-account' component={NewAccount}/>
           <Route path='/stats/account' component={AccountStats}/>
           <Route path='/stats/global' component={GlobalStats}/>
         </Switch>
