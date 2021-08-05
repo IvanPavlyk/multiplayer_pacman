@@ -18,6 +18,7 @@ class GameState extends Schema {
   @type(['number']) walls = new ArraySchema<number>();
   @type('number') width = undefined;
   @type('number') height = undefined;
+  @type('number') time = Date.now();
   @type('number') counter = 0;
 }
 

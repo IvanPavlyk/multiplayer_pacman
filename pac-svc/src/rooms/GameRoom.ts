@@ -31,12 +31,13 @@ class GameRoom extends Room<GameState> {
   onCreate(): void {
     this.setState(new GameState());
     const powerUps = ['superSpeed', 'sizeIncrease', 'freezeAoe'];
-    const powerUpDict = {'superSpeed' : 3, 'sizeIncrease' : 5, 'freezeAoe' : 4};
+    const powerUpDict = { superSpeed: 3000, sizeIncrease: 5000, freezeAoe: 4000 };
     const pacmanBaseVelocity = 3;
 
     const playerCallbacks = {};
     const ghostCallbacks = {};
     let powerUpCallbacks = undefined;
+    let timeCallback = undefined;
 
     /* lobby event listeners */
     this.onMessage('PLAYER_READY', (client, message) => {
@@ -52,9 +53,7 @@ class GameRoom extends Room<GameState> {
         }
       }
 
-      this.state.gameCanStart = (
-        players.length > 1 && playersReady >= players.length - 1
-      );
+      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
     });
 
     this.onMessage('SEND_CHAT_MESSAGE', (client, message) => {
@@ -70,8 +69,7 @@ class GameRoom extends Room<GameState> {
     });
 
     this.onMessage('CHANGE_PLAYER_COLOR', (client) => {
-      this.state.players.get(client.id)
-        .tint = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+      this.state.players.get(client.id).tint = '#' + ((Math.random() * 0xffffff) << 0).toString(16);
     });
 
     this.onMessage('START_GAME', (client) => {
@@ -84,7 +82,7 @@ class GameRoom extends Room<GameState> {
     this.onMessage('LEAVE_MATCH', (client) => {
       client.leave();
     });
-    
+
     this.onMessage('GHOST_PLAYER_COLLISION', (client, message) => {
       const player = this.state.players.get(message.id);
       if (player && player.alive) {
@@ -106,24 +104,34 @@ class GameRoom extends Room<GameState> {
           this.state.pellets.push(ele);
         });
       }
+
+      if (!timeCallback) {
+        timeCallback = setInterval(() => {
+          this.state.time = Date.now();
+        }, 100);
+      }
+
       if (!powerUpCallbacks) {
-        powerUpCallbacks = setInterval(()=>{
-          for(let x = this.state.powerUps.length - 1; x >= 0; x--){
-            if(this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()){
+        powerUpCallbacks = setInterval(() => {
+          for (let x = this.state.powerUps.length - 1; x >= 0; x--) {
+            if (this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()) {
               this.state.powerUps.splice(x, 1);
             }
           }
-          if(this.state.powerUps.length >= 10){
+          if (this.state.powerUps.length >= 10) {
             return;
           }
-          let tempX, tempY; 
-          do{
-            tempX = Math.floor(Math.random()*this.state.width);
-            tempY = Math.floor(Math.random()*this.state.height);
-          } while(this.state.walls[tempX + tempY*this.state.width] || this.state.powerUps.some((e)=> e.x === tempX && e.y === tempY));
-          const randomPowerUp = Math.floor(Math.random()*powerUps.length);
-          this.state.powerUps.push(new PowerUp({x : tempX, y : tempY, name: powerUps[randomPowerUp]}));
-        }, 1000);
+          let tempX, tempY;
+          do {
+            tempX = Math.floor(Math.random() * this.state.width);
+            tempY = Math.floor(Math.random() * this.state.height);
+          } while (
+            this.state.walls[tempX + tempY * this.state.width] ||
+            this.state.powerUps.some((e) => e.x === tempX && e.y === tempY)
+          );
+          const randomPowerUp = Math.floor(Math.random() * powerUps.length);
+          this.state.powerUps.push(new PowerUp({ x: tempX, y: tempY, name: powerUps[randomPowerUp] }));
+        }, 10000);
       }
       if (!this.state.walls.length) {
         message.walls.forEach((ele) => {
@@ -138,7 +146,6 @@ class GameRoom extends Room<GameState> {
       }
       //Setting up ghost movement
       if (!(client.id in ghostCallbacks)) {
-        
         const ghost = this.state.ghosts.get(client.id);
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
         const state = this.state;
@@ -213,10 +220,13 @@ class GameRoom extends Room<GameState> {
               state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width] = 0;
               player.pelletsEaten += 1;
             }
-            const powerUpIndex = this.state.powerUps.findIndex((powerUp)=> Math.floor(player.x/32) === powerUp.x && Math.floor(player.y/32) === powerUp.y);
-            if(powerUpIndex !== -1){
+            const powerUpIndex = this.state.powerUps.findIndex(
+              (powerUp) => Math.floor(player.x / 32) === powerUp.x && Math.floor(player.y / 32) === powerUp.y
+            );
+            if (powerUpIndex !== -1) {
               this.state.powerUps[powerUpIndex].startTime = Date.now();
-              this.state.powerUps[powerUpIndex].endTime = this.state.powerUps[powerUpIndex].startTime + powerUpDict[this.state.powerUps[powerUpIndex].name];
+              this.state.powerUps[powerUpIndex].endTime =
+                this.state.powerUps[powerUpIndex].startTime + powerUpDict[this.state.powerUps[powerUpIndex].name];
               this.state.powerUps[powerUpIndex].id = player.id;
               this.state.powerUps[powerUpIndex].x = -100;
               this.state.powerUps[powerUpIndex].y = -100;
@@ -265,7 +275,7 @@ class GameRoom extends Room<GameState> {
     this.state.players.set(client.id, player);
     this.state.ghosts.set(client.id, new Ghost());
 
-    const randomColor = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    const randomColor = '#' + ((Math.random() * 0xffffff) << 0).toString(16);
     player.tint = randomColor;
 
     if (this.state.players.size === 1) {
@@ -288,7 +298,7 @@ class GameRoom extends Room<GameState> {
       const playerIds = Array.from(this.state.players.keys());
       this.state.adminId = playerIds.shift();
     }
-    
+
     try {
       if (this.state.gameStarted) throw 'Cannot reconnect when game is in-progress';
 
@@ -301,8 +311,9 @@ class GameRoom extends Room<GameState> {
       if (prevAdminId === client.id) {
         this.state.adminId = client.id;
       }
-
-    } catch(err) { console.log(err); }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
