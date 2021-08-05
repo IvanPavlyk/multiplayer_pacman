@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Container, Tooltip } from 'react-bootstrap';
 import { useColyseus } from 'components/ColyseusClient';
 import { useParams, useHistory } from 'react-router-dom';
+import PacmanIcon from 'components/PacmanIcon';
 import GameCanvas from 'components/GameCanvas';
 
-import player_pacman from 'assets/images/player-pacman.png';
 import player_select_title from 'assets/images/player-select-title.png';
 import icon_crown from 'assets/images/icon-crown.png';
 
@@ -64,8 +64,9 @@ const Room = () => {
     });
     setChatMessage('');
   }
-  function changeColor() {
-    room.send('CHANGE_COLOR');
+
+  function changePlayerColor() {
+    room.send('CHANGE_PLAYER_COLOR');
   }
 
   // get list of players
@@ -74,14 +75,6 @@ const Room = () => {
   for (let i = 0; i < 4 - length; i++) {
     players.push(null);
   }
-
-  const tint = {
-    16776960: 'pacman-yellow',
-    0xff0000: 'pacman-red',
-    0x00ff00: 'pacman-green',
-    0x0000ff: 'pacman-blue',
-  };
-  console.log(players);
 
   return (
     <Container className='room'>
@@ -95,21 +88,22 @@ const Room = () => {
 
         <div className='game__player-list'>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman} />
+            <PacmanIcon width='20' color={'red'} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman} />
+            <PacmanIcon width='20' color={'red'} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman} />
+            <PacmanIcon width='20' color={'red'} />
             <p>UberHaxor69</p>
           </div>
           <div className='player-card player-card--mini'>
-            <img width='20' src={player_pacman} />
+            <PacmanIcon width='20' color={'red'} />
             <p>UberHaxor69</p>
           </div>
+
         </div>
       </div>
 
@@ -141,16 +135,17 @@ const Room = () => {
                   <p className='player-card__subtitle'>Invite Players!</p>
                 </div>
               );
+
             } else {
               const chatMessage = roomState?.chatMessages?.get?.(player.id);
-
               return (
                 <div
                   className={`player-card ${player.id === room?.sessionId && 'player-card--is-player'}`}
+                  style={{'--select-color' : player.tint}}
                   key={`p-${i}`}
-                  onClick={player.id === room?.sessionId ? changeColor : null}
+                  onClick={player.id === room?.sessionId ? changePlayerColor : null}
                 >
-                  <img style={{ margin: '1.4rem 0 0.6rem' }} src={player_pacman} className={tint[player.tint]} />
+                  <PacmanIcon style={{ margin: '1.4rem 0 0.6rem' }} color={player.tint} />
 
                   <div style={{ position: 'relative' }}>
                     {chatMessage && <Tooltip placement='top'>{chatMessage}</Tooltip>}

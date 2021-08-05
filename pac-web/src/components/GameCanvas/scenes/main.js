@@ -92,7 +92,7 @@ export class MainScene extends Phaser.Scene {
         this.players[index].x = player.x;
         this.players[index].y = player.y;
         this.players[index].anims.play('moving', true);
-        this.players[index].setTint(player.tint);
+        this.players[index].setTint(Number(`0x${player.tint.substr(1)}`));
         if (player.direction === 'right') {
           this.players[index].setVelocityX(200);
           this.players[index].setVelocityY(0);

@@ -3,9 +3,14 @@ import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
 
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
 class GameRoom extends Room<GameState> {
   maxClients = 4;
   messageTimeouts = {};
+  colorIndex = 0;
 
   isAdmin(client: Client): boolean {
     return this.state.adminId === client.id;
@@ -23,12 +28,9 @@ class GameRoom extends Room<GameState> {
   }
 
   onCreate(): void {
-    const pacmanBaseVelocity = 3;
-    function mod(n, m) {
-      return ((n % m) + m) % m;
-    }
-    const tints = [0xffff00, 0xff0000, 0x00ff00, 0x0000ff];
     this.setState(new GameState());
+    const pacmanBaseVelocity = 3;
+
     const playerCallbacks = {};
     const ghostCallbacks = {};
 
@@ -46,7 +48,9 @@ class GameRoom extends Room<GameState> {
         }
       }
 
-      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
+      this.state.gameCanStart = (
+        players.length > 1 && playersReady >= players.length - 1
+      );
     });
 
     this.onMessage('SEND_CHAT_MESSAGE', (client, message) => {
@@ -61,16 +65,16 @@ class GameRoom extends Room<GameState> {
       }, 7000);
     });
 
+    this.onMessage('CHANGE_PLAYER_COLOR', (client) => {
+      this.state.players.get(client.id)
+        .tint = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    });
+
     this.onMessage('START_GAME', (client) => {
       if (!this.state.gameCanStart || this.state.gameStarted) return;
       if (this.isAdmin(client)) {
         this.startGame();
       }
-    });
-
-    this.onMessage('CHANGE_COLOR', (client) => {
-      const player = this.state.players.get(client.id);
-      player.tint = tints[(tints.indexOf(player.tint) + 1) % tints.length];
     });
 
     /* game event listeners */
@@ -211,9 +215,14 @@ class GameRoom extends Room<GameState> {
   }
 
   onJoin(client: Client): void {
-    this.state.players.set(client.id, new Player(client, { x: 32 * 5 + 16, y: 32 * 10 + 16 }));
+    const player = new Player(client);
+    this.state.players.set(client.id, player);
+
+    const randomColor = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    player.tint = randomColor;
 
     if (this.state.players.size === 1) {
+      player.tint = '#FFF001';
       this.state.adminId = client.id;
     }
   }

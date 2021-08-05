@@ -224,6 +224,8 @@
   }
 
   &--is-player {
+		cursor: pointer;
+		
     // outline
     &::before {
       content: '';
