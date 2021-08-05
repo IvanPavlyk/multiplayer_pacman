@@ -1,27 +1,10 @@
 diff a/pac-svc/src/rooms/GameRoom.ts b/pac-svc/src/rooms/GameRoom.ts	(rejected hunks)
-@@ -31,20 +31,18 @@
-       player.ready = message?.ready ?? !player.ready;
- 
-       // check if game can start (all players are ready)
--      const players = Array.from(this.state.players.values());
--
-       let playersReady = 0;
--      for (const player of players) {
--        if (!this.isAdmin(player.client)) {
-+      this.state.players.forEach((player, key) => {
-+        if (!this.isAdmin(key)) {
-           if (player.ready) playersReady++;
-         }
--      }
-+      });
- 
--      this.state.gameCanStart = players.length > 1 && playersReady >= players.length - 1;
-+      this.state.gameCanStart = this.state.players.size > 1 && playersReady >= this.state.players.size - 1;
-     });
- 
-     this.onMessage('START_GAME', (client) => {
--      if (this.state.gameCanStart && this.isAdmin(client)) {
-+      if (this.state.gameCanStart && this.isAdmin(client.id)) {
-         this.startGame();
+@@ -108,7 +108,7 @@
        }
-     });
+       if (!powerUpCallbacks) {
+         powerUpCallbacks = setInterval(()=>{
+-          for(var x = this.state.powerUps.length - 1; x >= 0; x--){
++          for(let x = this.state.powerUps.length - 1; x >= 0; x--){
+             if(this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()){
+               this.state.powerUps.splice(x, 1);
+             }
