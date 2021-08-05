@@ -1,22 +1,17 @@
-import axios from 'axios';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
 const PrivateRoute = ( {component: Component, ...rest} ) => {
-  useEffect(() => {
-    const tokenId = sessionStorage.getItem('tokenId');
-    axios.get(`http://localhost:3002/auth/user-is-authenticated/${tokenId}`)
-      .then( res => {
-        sessionStorage.setItem('isAuthenticated', res.data);
-      });
-  }, []);
-
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+  console.log(isAuthenticated);
   return (
     <Route
       {...rest}
-      render={(props) =>
-        sessionStorage.getItem('isAuthenticated') ? <Component {...props} /> : <Redirect to='/' />
-      }
+      render={ (props) => {
+        return isAuthenticated
+          ? <Component {...rest} {...props} />
+          : <Redirect to={'/'}/>;
+      }}
     />
   );
 };

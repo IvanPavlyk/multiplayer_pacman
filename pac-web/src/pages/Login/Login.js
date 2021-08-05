@@ -16,6 +16,7 @@ const Login = () => {
       email: profile.email
     };
     sessionStorage.setItem('tokenId', response.tokenId);
+    sessionStorage.setItem('isAuthenticated', true);
     console.log(response);
 
     axios.post('http://localhost:3002/auth/user-exists', user)
