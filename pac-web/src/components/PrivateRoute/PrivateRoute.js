@@ -1,24 +1,21 @@
-/* eslint-disable no-unused-vars */
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
 const PrivateRoute = ( {component: Component, ...rest} ) => {
-  const [isAuthenticated, setAuthenticated] = useState(false);
-
   useEffect(() => {
-    axios.get('/auth/isauthenticated').then(({data: {userIsAuthenticated}}) => {
-      if(userIsAuthenticated) {
-        setAuthenticated(true);
-      }
-    });
-  });
+    const tokenId = sessionStorage.getItem('tokenId');
+    axios.get(`http://localhost:3002/auth/user-is-authenticated/${tokenId}`)
+      .then( res => {
+        sessionStorage.setItem('isAuthenticated', res.data);
+      });
+  }, []);
 
   return (
     <Route
       {...rest}
       render={(props) =>
-        isAuthenticated ? <Component {...props} /> : <Redirect to='/' />
+        sessionStorage.getItem('isAuthenticated') ? <Component {...props} /> : <Redirect to='/' />
       }
     />
   );

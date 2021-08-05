@@ -3,13 +3,16 @@ import { type, Schema } from '@colyseus/schema';
 class Ghost extends Schema {
   @type('string') direction = 'right';
   @type('string') queuedDirection = 'right';
-  @type('number') x = 0;
-  @type('number') y = 0;
+  @type('string') color = 'yellow';
+  @type('boolean') alive = true;
+  @type('number') x = 11 * 32 + 16;
+  @type('number') y = 8 * 32 + 16;
 
-  constructor({ x, y }: { x: number; y: number }) {
+  constructor() {
     super();
-    this.x = x;
-    this.y = y;
+
+    const COLORS = ['yellow', 'red', 'green', 'blue'];
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)]
   }
 }
 
