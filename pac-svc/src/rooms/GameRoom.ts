@@ -17,15 +17,51 @@ class GameRoom extends Room<GameState> {
     return this.state.adminId === client.id;
   }
 
+  broadcastGameAlert(message: string): void {
+    this.state.gameAlertMessage = message;
+  }
+
+  // Game Mechanics
   startGame(): void {
+    const players = this.state.players;
+    const ghosts = this.state.ghosts;
+
+    // reset attributes for player
+    players.forEach((player) => { 
+      player.reset();
+    });
+
+    // reset attributes for ghost
+    ghosts.forEach((ghost) => { 
+      ghost.reset();
+    });
+
     this.state.gameStarted = true;
-    this.broadcastGameAlert('Get ready! In 3...');
     this.broadcast('GAME_START');
     this.lock();
   }
 
-  broadcastGameAlert(message: string): void {
-    this.state.gameAlertMessage = message;
+  endGame(): void {
+    const players = this.state.players;
+    this.state.gameStarted = false;
+    this.broadcast('GAME_END');
+    this.unlock();
+
+    players.forEach((player) => {
+      player.ready = false;
+    });
+  }
+
+  isRoundOver(): boolean {
+    const players = this.state.players;
+    let playersAlive = 0;
+
+    players.forEach((player) => {
+      if (player.alive) playersAlive++;
+      console.log(JSON.stringify(player))
+    });
+
+    return playersAlive <= 1;
   }
 
   onCreate(): void {
@@ -38,7 +74,7 @@ class GameRoom extends Room<GameState> {
     const ghostCallbacks = {};
     let powerUpCallbacks = undefined;
 
-    /* lobby event listeners */
+    /* LOBBY EVENT LISTENERS */
     this.onMessage('PLAYER_READY', (client, message) => {
       const player = this.state.players.get(client.id);
       player.ready = message?.ready ?? !player.ready;
@@ -76,12 +112,10 @@ class GameRoom extends Room<GameState> {
 
     this.onMessage('START_GAME', (client) => {
       if (!this.state.gameCanStart || this.state.gameStarted) return;
-      if (this.isAdmin(client)) {
-        this.startGame();
-      }
+      if (this.isAdmin(client)) this.startGame();
     });
 
-    this.onMessage('LEAVE_MATCH', (client) => {
+    this.onMessage('LEAVE_MATCH', (client: Client) => {
       client.leave();
     });
     
@@ -94,9 +128,14 @@ class GameRoom extends Room<GameState> {
         player.alive = false;
         ghost.alive = false;
       }
+
+      if (this.state.gameStarted && this.isRoundOver()) {
+        console.log('game over');
+        this.endGame();
+      }
     });
 
-    /* game event listeners */
+    /* GAME EVENT LISTENERS */
     this.onMessage('initMap', (client, message) => {
       const player = this.state.players.get(client.id);
 

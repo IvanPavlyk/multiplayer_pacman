@@ -1,6 +1,13 @@
 import Phaser from 'phaser';
 
 export class MainScene extends Phaser.Scene {
+  constructor() {
+    super();
+    this.playerDirection = undefined;
+    this.players = {};
+    this.playersAlive = {};
+  }
+
   preload() {
     this.load.image('tiles', '/game-assets/chompermazetiles.png');
     this.load.spritesheet('pacman', '/game-assets/pacman.png', { frameWidth: 16, frameHeight: 16 });
@@ -25,6 +32,7 @@ export class MainScene extends Phaser.Scene {
         });
       })
     );
+
     this.walls = [].concat(
       ...this.BaseLayer.layer.data.map((row) => {
         return row.map((ele) => {
@@ -32,6 +40,7 @@ export class MainScene extends Phaser.Scene {
         });
       })
     );
+
     this.controller.send('initMap', {
       pellets: this.pellets,
       walls: this.walls,
@@ -40,9 +49,7 @@ export class MainScene extends Phaser.Scene {
     });
     this.BaseLayer.setCollisionByExclusion([-1]);
 
-    this.playerDirection = undefined;
-    this.players = {};
-    this.playersAlive = {};// { [this.controller.sessionId]: this.physics.add.sprite(48, 48, 'pacman', 0) };
+// { [this.controller.sessionId]: this.physics.add.sprite(48, 48, 'pacman', 0) };
     // this.players[this.controller.sessionId].setScale(2);
     // this.physics.add.collider(this.players[this.controller.sessionId], this.BaseLayer);
 
@@ -68,6 +75,7 @@ export class MainScene extends Phaser.Scene {
     var directionDict = {0: 'right', 1 : 'left', 2 : 'up', 3 : 'down'};
     var colorDict = {0: 'yellow', 1 : 'red', 2 : 'green', 3 : 'blue'};
     var powerUpDict = {'superSpeed' : 44, 'sizeIncrease': 45, 'freezeAoe' : 46};
+
     for(var x = 0; x < 4; x++){
       for(var y = 0; y < 4; y++){
         this.anims.create({
@@ -103,139 +111,143 @@ export class MainScene extends Phaser.Scene {
     //   repeat: -1,
     // });
 
-    this.controller.onStateChange((newState) => {
-      newState.players.forEach((player, index) => {
-        if (!this.players[index]) {
-          this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
-          this.players[index].setScale(2);
-          this.physics.add.collider(this.players[index], this.BaseLayer);
-          this.playersAlive[index] = true;
-        }
-        
-        if(!player.alive && this.playersAlive[index]){
-          this.playersAlive[index] = false;
-          this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(0);
-          this.players[index].flipX = false;
-          this.players[index].setRotation(0);
-          this.players[index].anims.play('dying', true);
-          this.players[index].on('animationcomplete', ()=>{
-            this.players[index].destroy();
-          });
-          return;
-        }
-        if(!player.alive){
-          return;
-        }
-        this.players[index].x = player.x;
-        this.players[index].y = player.y;
-        this.players[index].anims.play('moving', true);
-        this.players[index].setTint(Number(`0x${player.tint.substr(1)}`));
-        if (player.direction === 'right') {
-          this.players[index].setVelocityX(200);
-          this.players[index].setVelocityY(0);
-          this.players[index].flipX = false;
-          this.players[index].setRotation(0);
-        }
-        if (player.direction === 'left') {
-          this.players[index].setVelocityX(-200);
-          this.players[index].setVelocityY(0);
-          this.players[index].flipX = true;
-          this.players[index].setRotation(0);
-        }
-        if (player.direction === 'up') {
-          this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(-200);
-          this.players[index].flipX = true;
-          this.players[index].setRotation(3.14 / 2);
-        }
-        if (player.direction === 'down') {
-          this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(200);
-          this.players[index].flipX = true;
-          this.players[index].setRotation(-3.14 / 2);
-        }
-        if (player.velocity === 0) {
-          this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(0);
-          this.players[index].anims.play('moving', false);
-        }
-      });
-
-      for (let session in this.players) {
-        if (!newState.players.get(session)) {
-          this.players[session].destroy();
-          delete this.players[session];
-        }
-      }
-      for (let session in this.ghosts) {
-        if (!newState.players.get(session)) {
-          this.ghosts[session].destroy();
-          delete this.ghosts[session];
-        }
-      }
-
-      newState.ghosts.forEach((ghost, index) => {
-        if (!this.ghosts[index]) {
-          this.ghostsAlive[index] = true;
-          this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
-          this.ghosts[index].setScale(2);
-          this.physics.add.collider(this.ghosts[index], this.BaseLayer);
-          this.physics.add.overlap(this.players[index], this.ghosts[index], function(){
-            this.controller.send('GHOST_PLAYER_COLLISION', {id: index});
-          }, null, this);
-        }
-        if(!ghost.alive && this.ghostsAlive[index]){
-          this.ghostsAlive[index] = false;
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].flipX = false;
-          this.ghosts[index].setRotation(0);
-          this.ghosts[index].destroy();
-          return;
-        }
-        if(!ghost.alive){
-          return;
-        }
-        this.ghosts[index].x = ghost.x;
-        this.ghosts[index].y = ghost.y;
-        if (ghost.direction === 'right') {
-          this.ghosts[index].setVelocityX(67);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].anims.play(`ghostright${ghost.color}`, true);
-        }
-        if (ghost.direction === 'left') {
-          this.ghosts[index].setVelocityX(-67);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].anims.play(`ghostleft${ghost.color}`, true);
-        }
-        if (ghost.direction === 'up') {
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(-67);
-          this.ghosts[index].anims.play(`ghostup${ghost.color}`, true);
-        }
-        if (ghost.direction === 'down') {
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(67);
-          this.ghosts[index].anims.play(`ghostdown${ghost.color}`, true);
-        }
-      });
-
-      newState.powerUps.forEach((powerUp)=>{
-        if(!powerUp.id && !this.unEatenPowerUps[powerUp.spawnTime]){
-          this.unEatenPowerUps[powerUp.spawnTime] = this.physics.add.sprite(powerUp.x *32 + 16, powerUp.y *32 + 16, 'pacman', powerUpDict[powerUp.name]);
-          this.unEatenPowerUps[powerUp.spawnTime].setScale(2);
-        }
-        else if(powerUp.id && this.unEatenPowerUps[powerUp.spawnTime]){
-          this.unEatenPowerUps[powerUp.spawnTime].destroy();
-          delete this.unEatenPowerUps[powerUp.spawnTime];
-        }
-      });
-
-    });
-   
+    window.gameUpdateFn = this.controller.onStateChange(this.updateState);
   }
 
+  updateState = (newState) => {
+    var powerUpDict = {'superSpeed' : 44, 'sizeIncrease': 45, 'freezeAoe' : 46};
+
+    if (!newState.gameStarted) return;
+    if (!this.players) return;
+    
+    newState.players.forEach((player, index) => {
+      if (!this.players[index]) {
+        this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
+        this.players[index].setScale(2);
+        this.physics.add.collider(this.players[index], this.BaseLayer);
+        this.playersAlive[index] = true;
+      }
+      
+      if(!player.alive && this.playersAlive[index]){
+        this.playersAlive[index] = false;
+        this.players[index].setVelocityX(0);
+        this.players[index].setVelocityY(0);
+        this.players[index].flipX = false;
+        this.players[index].setRotation(0);
+        this.players[index]?.anims?.play?.('dying', true);
+        this.players[index].on('animationcomplete', ()=>{
+          this.players[index].destroy();
+        });
+        return;
+      }
+      if(!player.alive){
+        return;
+      }
+      this.players[index].x = player.x;
+      this.players[index].y = player.y;
+      this.players[index]?.anims?.play?.('moving', true);
+      this.players[index].setTint(Number(`0x${player.tint.substr(1)}`));
+      if (player.direction === 'right') {
+        this.players[index].setVelocityX(200);
+        this.players[index].setVelocityY(0);
+        this.players[index].flipX = false;
+        this.players[index].setRotation(0);
+      }
+      if (player.direction === 'left') {
+        this.players[index].setVelocityX(-200);
+        this.players[index].setVelocityY(0);
+        this.players[index].flipX = true;
+        this.players[index].setRotation(0);
+      }
+      if (player.direction === 'up') {
+        this.players[index].setVelocityX(0);
+        this.players[index].setVelocityY(-200);
+        this.players[index].flipX = true;
+        this.players[index].setRotation(3.14 / 2);
+      }
+      if (player.direction === 'down') {
+        this.players[index].setVelocityX(0);
+        this.players[index].setVelocityY(200);
+        this.players[index].flipX = true;
+        this.players[index].setRotation(-3.14 / 2);
+      }
+      if (player.velocity === 0) {
+        this.players[index].setVelocityX(0);
+        this.players[index].setVelocityY(0);
+        this.players[index].anims.play('moving', false);
+      }
+    });
+
+    for (let session in this.players) {
+      if (!newState.players.get(session)) {
+        this.players[session].destroy();
+        delete this.players[session];
+      }
+    }
+    for (let session in this.ghosts) {
+      if (!newState.players.get(session)) {
+        this.ghosts[session].destroy();
+        delete this.ghosts[session];
+      }
+    }
+
+    newState.ghosts.forEach((ghost, index) => {
+      if (!this.ghosts[index]) {
+        this.ghostsAlive[index] = true;
+        this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
+        this.ghosts[index].setScale(2);
+        this.physics.add.collider(this.ghosts[index], this.BaseLayer);
+        this.physics.add.overlap(this.players[index], this.ghosts[index], function(){
+          this.controller.send('GHOST_PLAYER_COLLISION', {id: index});
+        }, null, this);
+      }
+      if(!ghost.alive && this.ghostsAlive[index]){
+        this.ghostsAlive[index] = false;
+        this.ghosts[index].setVelocityX(0);
+        this.ghosts[index].setVelocityY(0);
+        this.ghosts[index].flipX = false;
+        this.ghosts[index].setRotation(0);
+        this.ghosts[index].destroy();
+        return;
+      }
+      if(!ghost.alive){
+        return;
+      }
+      this.ghosts[index].x = ghost.x;
+      this.ghosts[index].y = ghost.y;
+      if (ghost.direction === 'right') {
+        this.ghosts[index].setVelocityX(67);
+        this.ghosts[index].setVelocityY(0);
+        this.ghosts[index].anims.play(`ghostright${ghost.color}`, true);
+      }
+      if (ghost.direction === 'left') {
+        this.ghosts[index].setVelocityX(-67);
+        this.ghosts[index].setVelocityY(0);
+        this.ghosts[index].anims.play(`ghostleft${ghost.color}`, true);
+      }
+      if (ghost.direction === 'up') {
+        this.ghosts[index].setVelocityX(0);
+        this.ghosts[index].setVelocityY(-67);
+        this.ghosts[index].anims.play(`ghostup${ghost.color}`, true);
+      }
+      if (ghost.direction === 'down') {
+        this.ghosts[index].setVelocityX(0);
+        this.ghosts[index].setVelocityY(67);
+        this.ghosts[index].anims.play(`ghostdown${ghost.color}`, true);
+      }
+    });
+
+    newState.powerUps.forEach((powerUp)=>{
+      if(!powerUp.id && !this.unEatenPowerUps[powerUp.spawnTime]){
+        this.unEatenPowerUps[powerUp.spawnTime] = this.physics.add.sprite(powerUp.x *32 + 16, powerUp.y *32 + 16, 'pacman', powerUpDict[powerUp.name]);
+        this.unEatenPowerUps[powerUp.spawnTime].setScale(2);
+      }
+      else if(powerUp.id && this.unEatenPowerUps[powerUp.spawnTime]){
+        this.unEatenPowerUps[powerUp.spawnTime].destroy();
+        delete this.unEatenPowerUps[powerUp.spawnTime];
+      }
+    });
+  }
 
   update() {
     if(this.playersAlive[this.controller.sessionId]){
