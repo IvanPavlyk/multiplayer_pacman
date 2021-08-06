@@ -14,10 +14,11 @@ class GameState extends Schema {
   @type('string') adminId = null;
 
   @type(['number']) pellets = new ArraySchema<number>();
-  @type([PowerUp]) powerUps = new ArraySchema<PowerUp>();
+  @type({ map: PowerUp }) powerUps = new MapSchema<PowerUp>();
   @type(['number']) walls = new ArraySchema<number>();
   @type('number') width = undefined;
   @type('number') height = undefined;
+  @type('number') time = Date.now();
   @type('number') counter = 0;
 }
 

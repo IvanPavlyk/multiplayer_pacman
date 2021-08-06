@@ -11,7 +11,6 @@ const AccountStats = () => {
     const id = sessionStorage.getItem('id');
     axios.get(`http://localhost:3002/match-history/${id}`)
       .then( res => {
-        console.log(res);
         setMatches(res.data);
       });
   }, []);
@@ -19,18 +18,18 @@ const AccountStats = () => {
   const getMatchCards = () => {
     
     let gameNumber = 1;
-    return matches.map( match => {
+    const matchList = matches.map( match => {
       return (
         <Accordion defaultActiveKey='0' key={match?.id}>
           <Card>
             <Card.Header className='custom-card-header'>
-              <Accordion.Toggle as={Button} variant='link' eventKey='0'>
-                Game {gameNumber++}
+              <Accordion.Toggle as={Button} className='card-header-text' variant='link' eventKey='0'>
+                GAME {gameNumber++}
               </Accordion.Toggle>
             </Card.Header>
             <Accordion.Collapse eventKey='0'>
               <Card.Body className='card-body'>
-                <table className='table table-striped'>
+                <table className='table'>
                   <tbody>
                     <tr>
                       <th scope='row'>PELLETS EATEN</th>
@@ -51,6 +50,12 @@ const AccountStats = () => {
         </Accordion>
       );
     }).reverse();
+
+    if(matchList.length < 1){
+      return <h1 className='match-history-text'>No games played.</h1>;
+    } else {
+      return matchList;
+    }
   };
 
   return(<div className='container account-stats-accordian'>

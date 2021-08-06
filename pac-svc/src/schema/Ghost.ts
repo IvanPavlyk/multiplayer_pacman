@@ -1,12 +1,19 @@
 import { type, Schema } from '@colyseus/schema';
 
 class Ghost extends Schema {
-  @type('string') direction = 'right';
-  @type('string') queuedDirection = 'right';
+  @type('string') direction = undefined;
+  @type('string') queuedDirection = undefined;
   @type('string') color = 'yellow';
   @type('boolean') alive = true;
   @type('number') x = 0;
   @type('number') y = 0;
+
+  @type('number') velocity = 1;
+  @type('number') normalVelocity = 1;
+  @type('number') slowVelocity = 0.5;
+
+  @type('string') currentPowerUp = undefined;
+  @type('number') endTime = 0;
 
   constructor() {
     super();
