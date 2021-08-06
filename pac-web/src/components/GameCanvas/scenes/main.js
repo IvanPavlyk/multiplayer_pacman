@@ -66,12 +66,12 @@ export class MainScene extends Phaser.Scene {
 
     this.ghosts = {};
     this.ghostsAlive = {};
-
     this.unEatenPowerUps = {};
 
     var directionDict = { 0: 'right', 1: 'left', 2: 'up', 3: 'down' };
     var colorDict = { 0: 'yellow', 1: 'red', 2: 'green', 3: 'blue' };
     var powerUpDict = { superSpeed: 44, sizeIncrease: 45, freezeAoe: 46 };
+
     for (var x = 0; x < 4; x++) {
       for (var y = 0; y < 4; y++) {
         this.anims.create({
@@ -95,9 +95,6 @@ export class MainScene extends Phaser.Scene {
 
   updateState = (newState) => {
     var powerUpDict = {'superSpeed' : 44, 'sizeIncrease': 45, 'freezeAoe' : 46};
-
-    if (!newState.gameStarted) return;
-    if (!this.players) return;
 
     newState.players.forEach((player, index) => {
       if (!this.players[index]) {
