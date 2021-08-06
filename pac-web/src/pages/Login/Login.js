@@ -5,6 +5,8 @@ import { Form, Button, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { GoogleLogin } from 'react-google-login';
 
+import './login.scss';
+
 const Login = () => {
   const history = useHistory();
   const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'; //TODO: move to enviornment variable
@@ -43,6 +45,9 @@ const Login = () => {
 
   return (
     <Container>
+      <Row className='justify-content-center'>
+        <h1 className='login-text'>Please login...</h1>
+      </Row>
       <Row className='justify-content-center'>
         <GoogleLogin 
           clientId={clientId}

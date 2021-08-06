@@ -18,7 +18,7 @@ const AccountStats = () => {
   const getMatchCards = () => {
     
     let gameNumber = 1;
-    return matches.map( match => {
+    const matchList = matches.map( match => {
       return (
         <Accordion defaultActiveKey='0' key={match?.id}>
           <Card>
@@ -50,6 +50,12 @@ const AccountStats = () => {
         </Accordion>
       );
     }).reverse();
+
+    if(matchList.length < 1){
+      return <h1 className='match-history-text'>No games played.</h1>;
+    } else {
+      return matchList;
+    }
   };
 
   return(<div className='container account-stats-accordian'>

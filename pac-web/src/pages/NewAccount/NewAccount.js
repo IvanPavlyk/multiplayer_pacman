@@ -23,6 +23,8 @@ const NewAccount = () => {
     event.preventDefault();
     axios.post('http://localhost:3002/add-user', accountInfo) //TODO: push url to enviornment variable or helper function
       .then( res => {
+        console.log(res);
+        sessionStorage.setItem('id',res.data);
         history.push('/home');
       })
       .catch ( error => {
