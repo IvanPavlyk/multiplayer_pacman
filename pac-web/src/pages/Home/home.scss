@@ -2,18 +2,18 @@
 	display: flex;
 	align-items: center;
 	flex-direction: column;
+	padding: calc(4rem + 4vw) 1rem !important; 
 	color: white;
 
 	// bootstrap override
 	.row {
 		margin: 0;
 	}
-
 }
 
 .or-divider {
 	width: 100%;
-	padding: 0.6rem 0;
+	padding: 0.8rem 0 0.6rem;
 
 	display: flex;
 	align-items: center;
@@ -40,17 +40,17 @@
 
 .create-btn {
 	width: 100%;
-	background: #0043ff;
-	color: white;
+	background: #fff001;
+	color: #010101;
 	border-radius: 8px;
 	padding: 0.8rem;
 
 	text-transform: uppercase;
 	border: none;
-	border-bottom: 6px solid darken(#0043ff, 15);
+	box-shadow: 0 6px 0 darken(#fff001, 15);
 
 	&:active {
-		margin-top: 4px;
-		border-bottom-width: 2px;
+		transform: translateY(4px);
+		box-shadow: 0 2px 0 darken(#fff001, 15);
 	}
 }

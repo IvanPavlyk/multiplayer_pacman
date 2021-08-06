@@ -24,7 +24,7 @@ const Room = () => {
   useEffect(() => {
     let room = null;
 
-    (async () => {
+  (async () => {
       room = window.room || (await client.joinRoomById(id));
       if (room == null) return history.push('/');
       window.room = room;
@@ -35,11 +35,23 @@ const Room = () => {
       });
 
       room.onMessage('GAME_START', () => {
-        setGameInstance(<GameCanvas controller={room} />);
+        setGameInstance(<GameCanvas controller={room}/>);
+      });
+
+      room.onMessage('GAME_END', () => {
+        setGameInstance(null);
+        setReady(false);
       });
 
       room.send('PLAYER_READY', { ready });
+
     })();
+
+    // leave on umount
+    return (() => {
+      room?.send?.('LEAVE_MATCH');
+      window.room = null;
+    });
   }, []);
 
   function isRoomAdmin(id) {

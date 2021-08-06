@@ -36,6 +36,17 @@ class Player extends Schema {
     super();
     this.id = client.id;
     this.client = client;
+    this.reset();
+  }
+
+  reset() {
+    this.alive = true;
+    this.x = 32 * 5 + 16;
+    this.y = 32 * 10 + 16;
+    this.direction = 'right';
+    this.queuedDirection = 'right';
+    this.velocity = 3;
+    this.pelletsEaten = 0;
   }
 }
 

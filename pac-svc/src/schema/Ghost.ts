@@ -5,8 +5,8 @@ class Ghost extends Schema {
   @type('string') queuedDirection = undefined;
   @type('string') color = 'yellow';
   @type('boolean') alive = true;
-  @type('number') x = 11 * 32 + 16;
-  @type('number') y = 8 * 32 + 16;
+  @type('number') x = 0;
+  @type('number') y = 0;
 
   @type('number') velocity = 1;
   @type('number') normalVelocity = 1;
@@ -17,9 +17,16 @@ class Ghost extends Schema {
 
   constructor() {
     super();
+    this.reset();
+  }
 
+  reset() {
     const COLORS = ['yellow', 'red', 'green', 'blue'];
     this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+    this.alive = true;
+    this.x = 11 * 32 + 16;
+    this.y = 8 * 32 + 16;
   }
 }
 

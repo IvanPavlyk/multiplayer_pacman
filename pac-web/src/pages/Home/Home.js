@@ -43,6 +43,7 @@ const Home = () => {
             type='text'
             value={id}
             onChange={(e) => setValue(e.target.value)}
+            maxLength='9'
           />
           <Button onClick={() => joinRoom(id)}>Join by ID</Button>
         </Row>

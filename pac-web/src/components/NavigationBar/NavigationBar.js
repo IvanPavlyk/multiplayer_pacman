@@ -23,7 +23,6 @@ const NavigationBar = (props) => {
       if (confirm('Are you sure you want to leave the room?')) {
         history.push(selectedKey);
         client.clearSession();
-        window.location.reload();
       }
 
     } else {
