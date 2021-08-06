@@ -48,7 +48,7 @@ const Room = () => {
       });
 
       room.send('PLAYER_READY', { ready });
-      room.send('SET_PID', { id: sessionStorage.getItem('id') });
+      room.send('SET_PID', { id: sessionStorage.getItem('id'), name: sessionStorage.getItem('userName') });
     })();
 
     // leave on umount
@@ -118,7 +118,7 @@ const Room = () => {
                   key={`p1-${i}`}
                 >
                   <PacmanIcon width='20' color={player.tint} />
-                  <p>UberHaxor69</p>
+                  <p>{player.username}</p>
                 </div>
               );
             })}
@@ -166,7 +166,7 @@ const Room = () => {
 
                   <div style={{ position: 'relative' }}>
                     {chatMessage && <Tooltip placement='top'>{chatMessage}</Tooltip>}
-                    <p>UberHaxor69</p>
+                    <p>{player.username}</p>
                   </div>
 
                   <p>

@@ -146,6 +146,7 @@ class GameRoom extends Room<GameState> {
     this.onMessage('SET_PID', (client: Client, message) => {
       const player = this.state.players.get(client.id);
       player.uid = message.id;
+      player.username = message.name;
     });
 
     this.onMessage('GHOST_PLAYER_COLLISION', (client, message) => {
@@ -236,7 +237,7 @@ class GameRoom extends Room<GameState> {
             `${tempX}_${tempY}`,
             new PowerUp({ x: tempX, y: tempY, name: powerUps[randomPowerUp] })
           );
-        }, 1000);
+        }, 4000);
       }
       if (!this.state.walls.length) {
         message.walls.forEach((ele) => {

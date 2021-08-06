@@ -15,27 +15,29 @@ const Login = () => {
     const profile = response.profileObj;
     const user = {
       name: profile.name,
-      email: profile.email
+      email: profile.email,
     };
     sessionStorage.setItem('tokenId', response.tokenId);
-    sessionStorage.setItem('userName', profile.name);
     sessionStorage.setItem('isAuthenticated', true);
     console.log(response);
 
-    axios.post('http://localhost:3002/auth/user-exists', user)
-      .then (res => {
+    axios
+      .post('http://localhost:3002/auth/user-exists', user)
+      .then((res) => {
         //TODO: clean up localstorage call
-        if(parseInt(res.data.rowCount) === 1) {
+        if (parseInt(res.data.rowCount) === 1) {
           sessionStorage.setItem('id', res.data.rows[0].id);
+          sessionStorage.setItem('userName', res.data.rows[0].username);
+
           history.push('/home');
         } else {
           history.push({
-            pathname:'/new-account',
-            state: {detail: user}
+            pathname: '/new-account',
+            state: { detail: user },
           });
         }
       })
-      .catch (error => {
+      .catch((error) => {
         console.error(error);
       });
   };
@@ -51,7 +53,7 @@ const Login = () => {
         <h1 className='login-text'>Please login...</h1>
       </Row>
       <Row className='justify-content-center'>
-        <GoogleLogin 
+        <GoogleLogin
           clientId={clientId}
           buttonText='Log in with Google'
           onSuccess={onLoginSuccess}

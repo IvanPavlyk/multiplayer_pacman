@@ -30,6 +30,7 @@ class Player extends Schema {
 
   @type('string') id = null;
   @type('string') uid = null;
+  @type('string') username = null;
 
   client: Client = null;
 
