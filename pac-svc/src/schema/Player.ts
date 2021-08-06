@@ -19,8 +19,12 @@ class Player extends Schema {
   @type('number') slowVelocity = 1;
 
   @type('string') currentPowerUp = undefined;
+  @type('string') currentPowerUpName = undefined;
   @type('number') endTime = 0;
   @type('number') pelletsEaten = 0;
+  @type('number') ghostsEaten = 0;
+  @type('number') playersEaten = 0;
+  @type('number') powerupsEaten = 0;
   @type('string') tint = '#FFF001';
   @type('boolean') stopped = true;
 

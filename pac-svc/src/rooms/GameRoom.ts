@@ -3,10 +3,12 @@ import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
 import PowerUp from '../schema/PowerUp';
+import { exit } from 'process';
 
 function mod(n, m) {
   return ((n % m) + m) % m;
 }
+
 function resetDefault(player) {
   player.velocity = player.normalVelocity;
   //if not ghost
@@ -15,6 +17,15 @@ function resetDefault(player) {
   }
   player.currentPowerUp = undefined;
   player.endTime = 0;
+}
+
+function checkEnd(state) {
+  let alive = 0;
+  state.players.forEach((player) => {
+    // console.log({ ...player });
+    alive += player.alive;
+  });
+  return alive <= 1;
 }
 
 class GameRoom extends Room<GameState> {
@@ -41,12 +52,14 @@ class GameRoom extends Room<GameState> {
     this.setState(new GameState());
     const powerUps = ['superSpeed', 'sizeIncrease', 'freezeAoe'];
     const powerUpDict = { superSpeed: 3000, sizeIncrease: 5000, freezeAoe: 4000 };
-    const pacmanBaseVelocity = 3;
+    let playerSpawn;
+    let ghostSpawn;
 
     const playerCallbacks = {};
     const ghostCallbacks = {};
     let powerUpCallbacks = undefined;
     let timeCallback = undefined;
+    let ghostEatenCallback = undefined;
 
     /* lobby event listeners */
     this.onMessage('PLAYER_READY', (client, message) => {
@@ -97,10 +110,11 @@ class GameRoom extends Room<GameState> {
       const playerGhost = this.state.ghosts.get(message.playerIndex);
       const collisionGhost = this.state.ghosts.get(message.ghostIndex);
       if (collisionGhost && player && player.alive && player.radius === player.powerUpRadius) {
+        player.ghostsEaten += 1;
         collisionGhost.alive = false;
         collisionGhost.x = 11 * 32 + 16;
         collisionGhost.y = 8 * 32 + 16;
-        setTimeout(() => {
+        ghostEatenCallback = setTimeout(() => {
           collisionGhost.alive = true;
         }, 5000);
       } else if (player && player.alive) {
@@ -108,7 +122,34 @@ class GameRoom extends Room<GameState> {
         clearInterval(ghostCallbacks[message.playerIndex]);
         player.alive = false;
         playerGhost.alive = false;
+        if (ghostEatenCallback) {
+          clearTimeout(ghostEatenCallback);
+        }
+        checkEnd(this.state);
       }
+    });
+
+    this.onMessage('PLAYER_PLAYER_COLLISION', (client, message) => {
+      const player = this.state.players.get(message.playerIndex);
+      const playerGhost = this.state.ghosts.get(message.playerIndex);
+      const otherPlayer = this.state.players.get(message.otherPlayerIndex);
+      const otherPlayerGhost = this.state.ghosts.get(message.otherPlayerIndex);
+      if (player && player.alive && otherPlayer && otherPlayer.alive) {
+        if (player.radius > otherPlayer.radius) {
+          clearInterval(playerCallbacks[message.otherPlayerIndex]);
+          clearInterval(ghostCallbacks[message.otherPlayerIndex]);
+          otherPlayer.alive = false;
+          otherPlayerGhost.alive = false;
+          player.playersEaten += 1;
+        } else if (player.radius < otherPlayer.radius) {
+          clearInterval(playerCallbacks[message.playerIndex]);
+          clearInterval(ghostCallbacks[message.playerIndex]);
+          player.alive = false;
+          playerGhost.alive = false;
+          otherPlayer.playersEaten += 1;
+        }
+      }
+      checkEnd(this.state);
     });
 
     /* game event listeners */
@@ -159,10 +200,25 @@ class GameRoom extends Room<GameState> {
       }
       if (!this.state.height) {
         this.state.height = message.height;
+        playerSpawn = [
+          [1, 1],
+          [this.state.width - 2, 1],
+          [1, this.state.height - 2],
+          [this.state.width - 2, this.state.height - 2],
+        ];
+        ghostSpawn = [
+          [9, 8],
+          [10, 8],
+          [12, 8],
+          [13, 8],
+        ];
       }
       //Setting up ghost movement
       if (!(client.id in ghostCallbacks)) {
         const ghost = this.state.ghosts.get(client.id);
+        [ghost.x, ghost.y] = ghostSpawn
+          .splice(Math.floor(Math.random() * ghostSpawn.length), 1)[0]
+          .map((e) => e * 32 + 16);
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
         const state = this.state;
         ghostCallbacks[client.id] = setInterval(() => {
@@ -234,6 +290,9 @@ class GameRoom extends Room<GameState> {
         }, 10);
       }
       if (!(client.id in playerCallbacks)) {
+        [player.x, player.y] = playerSpawn
+          .splice(Math.floor(Math.random() * playerSpawn.length), 1)[0]
+          .map((e) => e * 32 + 16);
         const state = this.state;
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
         playerCallbacks[client.id] = setInterval(() => {
@@ -262,7 +321,7 @@ class GameRoom extends Room<GameState> {
             const powerUpIndex = `${Math.floor(player.x / 32)}_${Math.floor(player.y / 32)}`;
             if (this.state.powerUps[powerUpIndex]) {
               resetDefault(player);
-
+              player.powerupsEaten += 1;
               this.state.powerUps[powerUpIndex].x = -100;
               this.state.powerUps[powerUpIndex].y = -100;
               if (this.state.powerUps[powerUpIndex].name === powerUps[0]) {
@@ -276,6 +335,8 @@ class GameRoom extends Room<GameState> {
                 player.endTime = Date.now() + powerUpDict[player.currentPowerUp];
               }
               if (this.state.powerUps[powerUpIndex].name === powerUps[2]) {
+                player.currentPowerUpName = powerUpIndex;
+                player.endTime = Date.now() + powerUpDict[player.currentPowerUp];
                 this.state.players.forEach((otherPlayer) => {
                   if (otherPlayer !== player) {
                     if (

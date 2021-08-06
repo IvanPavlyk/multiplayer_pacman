@@ -4,6 +4,7 @@ export class MainScene extends Phaser.Scene {
   preload() {
     this.load.image('tiles', '/game-assets/chompermazetiles.png');
     this.load.spritesheet('pacman', '/game-assets/pacman.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('freeze', '/game-assets/freeze_explosion.png', { frameWidth: 100, frameHeight: 100 });
     this.cursors = this.input.keyboard.createCursorKeys();
 
     var json2 = require('../level/map3.json');
@@ -79,13 +80,30 @@ export class MainScene extends Phaser.Scene {
       }
     }
 
+    this.anims.create({
+      key: 'freeze',
+      frames: this.anims.generateFrameNumbers('freeze', { start: 1, end: 23 }),
+      frameRate: 23,
+      repeat: 0,
+    });
+
     this.controller.onStateChange((newState) => {
       newState.players.forEach((player, index) => {
         if (!this.players[index]) {
           this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
           this.players[index].setDepth(10);
-          // this.physics.add.collider(this.players[index], this.BaseLayer);
           this.playersAlive[index] = true;
+          newState.players.forEach((otherPlayer, otherPlayerIndex) => {
+            this.physics.add.overlap(
+              this.players[index],
+              this.players[otherPlayerIndex],
+              function () {
+                this.controller.send('PLAYER_PLAYER_COLLISION', { playerIndex: index, otherPlayerIndex });
+              },
+              null,
+              this
+            );
+          });
         }
 
         if (!player.alive && this.playersAlive[index]) {
@@ -106,6 +124,7 @@ export class MainScene extends Phaser.Scene {
         this.players[index].setScale(player.radius);
         this.players[index].x = player.x;
         this.players[index].y = player.y;
+        this.players[index].currentPowerUpName = player.currentPowerUpName;
         this.players[index].anims.play('moving', true);
         this.players[index].setTint(Number(`0x${player.tint.substr(1)}`));
         if (player.direction === 'right') {
@@ -206,18 +225,50 @@ export class MainScene extends Phaser.Scene {
 
       newState.powerUps.forEach((powerUp, key) => {
         if (!this.unEatenPowerUps[key]) {
-          this.unEatenPowerUps[key] = this.physics.add.sprite(
-            powerUp.x * 32 + 16,
-            powerUp.y * 32 + 16,
-            'pacman',
-            powerUpDict[powerUp.name]
-          );
-          this.unEatenPowerUps[key].setScale(2);
+          this.unEatenPowerUps[key] = {
+            sprite: this.physics.add.sprite(
+              powerUp.x * 32 + 16,
+              powerUp.y * 32 + 16,
+              'pacman',
+              powerUpDict[powerUp.name]
+            ),
+            powerUp: powerUp.name,
+          };
+          this.unEatenPowerUps[key].sprite.setScale(2);
         }
       });
       for (let i in this.unEatenPowerUps) {
         if (!newState.powerUps[i]) {
-          this.unEatenPowerUps[i].destroy();
+          if (this.unEatenPowerUps[i].powerUp === 'freezeAoe') {
+            let playerId = undefined;
+            for (let player in this.players) {
+              if (i === this.players[player].currentPowerUpName) {
+                playerId = player;
+                break;
+              }
+            }
+            console.log(playerId);
+            let freeze = this.physics.add.sprite(this.players[playerId].x, this.players[playerId].y, 'freeze', 1);
+            freeze.anims.play('freeze', true);
+            let scale = 0.3;
+            freeze.setDepth(3);
+            freeze.setScale(scale);
+            const freezeIntervale = setInterval(() => {
+              scale += 0.3;
+              if (freeze) {
+                freeze.setScale(scale);
+                freeze.x = this.players[playerId].x;
+                freeze.y = this.players[playerId].y;
+              } else {
+                clearInterval(freezeIntervale);
+              }
+            }, 3);
+            freeze.on('animationcomplete', () => {
+              freeze.destroy();
+              freeze = undefined;
+            });
+          }
+          this.unEatenPowerUps[i].sprite.destroy();
           delete this.unEatenPowerUps[i];
         }
       }
