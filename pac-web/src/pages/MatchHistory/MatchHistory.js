@@ -23,13 +23,13 @@ const AccountStats = () => {
         <Accordion defaultActiveKey='0' key={match?.id}>
           <Card>
             <Card.Header className='custom-card-header'>
-              <Accordion.Toggle as={Button} variant='link' eventKey='0'>
-                Game {gameNumber++}
+              <Accordion.Toggle as={Button} className='card-header-text' variant='link' eventKey='0'>
+                GAME {gameNumber++}
               </Accordion.Toggle>
             </Card.Header>
             <Accordion.Collapse eventKey='0'>
               <Card.Body className='card-body'>
-                <table className='table table-striped'>
+                <table className='table'>
                   <tbody>
                     <tr>
                       <th scope='row'>PELLETS EATEN</th>

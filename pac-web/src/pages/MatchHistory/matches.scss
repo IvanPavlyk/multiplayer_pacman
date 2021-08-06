@@ -5,3 +5,21 @@
 .match-history-text {
 	color: white;
 }
+
+.card-header-text {
+	color: white !important;
+}
+
+// Bootstrap override
+.card {
+	border-color: #1F2136 !important;
+	background-color: #1F2136 !important;
+}
+
+.card-header {
+	background-color: black !important;
+}
+
+.card-body {
+	background-color: #1F2136;
+}
