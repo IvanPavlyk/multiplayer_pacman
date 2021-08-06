@@ -146,5 +146,16 @@ const gameServer = new Server({
   server: createServer(app),
 });
 
+async function updateMatchHistory(userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten) {
+  const query =
+    'INSERT INTO pacman."MatchHistory"("userId", "gameId", result, "pelletsEaten", "ghostsEaten", "playersEaten", "powerupsEaten") VALUES ($1, $2, $3, $4, $5, $6, $7)';
+  try {
+    await pool.query(query, [userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten]);
+  } catch (err) {
+    console.error(err.stack);
+  }
+}
+module.exports = updateMatchHistory;
+
 gameServer.define('game-room', GameRoom);
 gameServer.listen(port);

@@ -41,7 +41,8 @@ const Login = () => {
   };
 
   const onLoginFailure = (response) => {
-    alert('Error while logging in.' + response);
+    alert('Error while logging in.');
+    console.error(response);
   };
 
   return (

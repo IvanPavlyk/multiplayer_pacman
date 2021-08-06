@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 import Home from 'pages/Home';
 import Room from 'pages/Room';
@@ -23,6 +23,7 @@ const Router = () => {
           <PrivateRoute path='/account' component={Account}/>
           <PrivateRoute path='/stats/account' component={MatchHistory}/>
           <PrivateRoute path='/stats/global' component={GlobalStats}/>
+          <Route render={() => <Redirect to={{pathname: '/home'}} />} />
         </Switch>
       </NavigationBar>
     </main>
