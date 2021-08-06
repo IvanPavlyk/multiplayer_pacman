@@ -25,14 +25,14 @@ const pool = new Pool({
 app.post('/add-user', async (req, res) => {
   const { username, email } = req.body;
   const query = 'INSERT INTO pacman."User"(id, username, email) VALUES ($1, $2, $3)';
-
-  let response;
+  const id = uuidv4();
   try {
-    response = await pool.query(query, [uuidv4(), username, email]);
+    await pool.query(query, [id, username, email]);
+    res.send(id);
   } catch (error) {
-    response = error;
+    console.error(error);
+    res.send(error);
   }
-  res.send(response);
 });
 
 //Will return an empty array if the user does not exist

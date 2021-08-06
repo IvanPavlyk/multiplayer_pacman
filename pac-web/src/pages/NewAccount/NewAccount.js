@@ -11,8 +11,6 @@ const NewAccount = () => {
     location.state.detail
   );
 
-  console.log(accountInfo);
-
   const handleChange = (event) => {
     setAccountInfo(
       {...accountInfo,
@@ -26,6 +24,7 @@ const NewAccount = () => {
     axios.post('http://localhost:3002/add-user', accountInfo) //TODO: push url to enviornment variable or helper function
       .then( res => {
         console.log(res);
+        sessionStorage.setItem('id',res.data);
         history.push('/home');
       })
       .catch ( error => {
@@ -37,8 +36,7 @@ const NewAccount = () => {
     <Container>
       <Form onSubmit={newAccountHandler}>
         <Form.Group className='mb-3' controlId='formBasicEmail'>
-          <Form.Label>PLAYER NAME</Form.Label>
-          <Form.Control type='text' onChange={handleChange}/>
+          <Form.Control type='text' onChange={handleChange} placeholder='USERNAME'/>
         </Form.Group>
         <Button variant='primary' type='submit'>Submit</Button>
       </Form>

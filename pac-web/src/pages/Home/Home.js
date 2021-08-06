@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import { GoogleLogout } from 'react-google-login';
@@ -25,6 +25,7 @@ const Home = () => {
   };
 
   const logoutSuccess = () => {
+    sessionStorage.removeItem('isAuthenticated');
     history.push('/');
   };
 
@@ -47,13 +48,14 @@ const Home = () => {
         </Row>
       </div>
 
-      {/* <Row className='justify-content-center'>
+      <Row className='justify-content-center'>
         <GoogleLogout
           clientId={clientId}
           buttonText='Logout'
           onLogoutSuccess={logoutSuccess}
+          className='mt-5'
         />
-      </Row> */}
+      </Row>
     </Container>
   );
 };

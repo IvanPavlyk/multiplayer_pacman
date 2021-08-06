@@ -8,7 +8,6 @@ const GlobalStats = () => {
   useEffect( () => {
     axios.get('http://localhost:3002/globalStats')
       .then( res => {
-        console.log(res);
         setGlobalStats(res.data[0]);
       });
   }, []);
