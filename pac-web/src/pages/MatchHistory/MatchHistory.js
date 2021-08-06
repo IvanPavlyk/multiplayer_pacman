@@ -43,6 +43,10 @@ const AccountStats = () => {
                       <th scope='row'>PLAYERS EATEN</th>
                       <td>{match.playersEaten}</td>
                     </tr>
+                    <tr>
+                      <th scope='row'>POWER-UPS EATEN</th>
+                      <td>{match.powerupsEaten}</td>
+                    </tr>
                   </tbody>
                 </table></Card.Body>
             </Accordion.Collapse>
