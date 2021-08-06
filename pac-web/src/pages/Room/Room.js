@@ -23,8 +23,7 @@ const Room = () => {
 
   useEffect(() => {
     let room = null;
-
-  (async () => {
+    (async () => {
       room = window.room || (await client.joinRoomById(id));
       if (room == null) return history.push('/');
       window.room = room;
@@ -35,7 +34,7 @@ const Room = () => {
       });
 
       room.onMessage('GAME_START', () => {
-        setGameInstance(<GameCanvas controller={room}/>);
+        setGameInstance(<GameCanvas controller={room} />);
       });
 
       room.onMessage('GAME_END', () => {
@@ -44,14 +43,14 @@ const Room = () => {
       });
 
       room.send('PLAYER_READY', { ready });
-
+      room.send('SET_PID', { id: sessionStorage.getItem('id') });
     })();
 
     // leave on umount
-    return (() => {
+    return () => {
       room?.send?.('LEAVE_MATCH');
       window.room = null;
-    });
+    };
   }, []);
 
   function isRoomAdmin(id) {
@@ -93,33 +92,34 @@ const Room = () => {
   return (
     <Container className='room'>
       {/* GAME */}
-      <div className={`game ${(!roomState?.gameStarted) && 'hidden'}`}>
-        <div className='game__alert'>
-          {roomState?.gameAlertMessage}
-        </div>
+      <div className={`game ${!roomState?.gameStarted && 'hidden'}`}>
+        <div className='game__alert'>{roomState?.gameAlertMessage}</div>
 
         {gameInstance}
 
         <div className='game__player-list'>
-          {(roomState?.gameStarted) && players.map((player, i) => {
-            if (player == null) return;
+          {roomState?.gameStarted &&
+            players.map((player, i) => {
+              if (player == null) return;
 
-            return (
-              <div 
-                className={`player-card player-card--mini ${player.id === room?.sessionId && 'player-card--is-player'}`} 
-                style={{'--select-color' : player.tint}}
-                key={`p1-${i}`}
-              >
-                <PacmanIcon width='20' color={player.tint} />
-                <p>UberHaxor69</p>
-              </div>
-            );
-          })}
+              return (
+                <div
+                  className={`player-card player-card--mini ${
+                    player.id === room?.sessionId && 'player-card--is-player'
+                  }`}
+                  style={{ '--select-color': player.tint }}
+                  key={`p1-${i}`}
+                >
+                  <PacmanIcon width='20' color={player.tint} />
+                  <p>UberHaxor69</p>
+                </div>
+              );
+            })}
         </div>
       </div>
 
       {/* LOBBY */}
-      <div className={`lobby ${(roomState?.gameStarted) && 'hidden'}`}>
+      <div className={`lobby ${roomState?.gameStarted && 'hidden'}`}>
         <div className='lobby__header'>
           <div className='room-id-desc'>
             <p>
@@ -146,13 +146,12 @@ const Room = () => {
                   <p className='player-card__subtitle'>Invite Players!</p>
                 </div>
               );
-
             } else {
               const chatMessage = roomState?.chatMessages?.get?.(player.id);
               return (
                 <div
                   className={`player-card ${player.id === room?.sessionId && 'player-card--is-player'}`}
-                  style={{'--select-color' : player.tint}}
+                  style={{ '--select-color': player.tint }}
                   key={`p-${i}`}
                   onClick={player.id === room?.sessionId ? changePlayerColor : null}
                 >

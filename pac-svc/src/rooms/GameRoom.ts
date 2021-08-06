@@ -3,7 +3,7 @@ import GameState from '../schema/GameState';
 import Player from '../schema/Player';
 import Ghost from '../schema/Ghost';
 import PowerUp from '../schema/PowerUp';
-import { exit } from 'process';
+import updateMatchHistory from '../app';
 
 function mod(n, m) {
   return ((n % m) + m) % m;
@@ -47,12 +47,12 @@ class GameRoom extends Room<GameState> {
     const ghosts = this.state.ghosts;
 
     // reset attributes for player
-    players.forEach((player) => { 
-      player.reset();
-    });
+    // players.forEach((player) => {
+    //   player.reset();
+    // });
 
     // reset attributes for ghost
-    ghosts.forEach((ghost) => { 
+    ghosts.forEach((ghost) => {
       ghost.reset();
     });
 
@@ -63,6 +63,23 @@ class GameRoom extends Room<GameState> {
 
   endGame(): void {
     const players = this.state.players;
+    let winner;
+    players.forEach((player) => {
+      if (player.alive) {
+        winner = player.id;
+      }
+    });
+    players.forEach((player) => {
+      updateMatchHistory(
+        player.uid,
+        winner,
+        player.id === winner ? 'loss' : 'win',
+        player.pelletsEaten,
+        player.ghostsEaten,
+        player.playersEaten,
+        player.powerupsEaten
+      );
+    });
     this.state.gameStarted = false;
     this.broadcast('GAME_END');
     this.unlock();
@@ -78,7 +95,7 @@ class GameRoom extends Room<GameState> {
 
     players.forEach((player) => {
       if (player.alive) playersAlive++;
-      console.log(JSON.stringify(player))
+      console.log(JSON.stringify(player));
     });
 
     return playersAlive <= 1;
@@ -137,6 +154,11 @@ class GameRoom extends Room<GameState> {
 
     this.onMessage('LEAVE_MATCH', (client: Client) => {
       client.leave();
+    });
+
+    this.onMessage('SET_PID', (client: Client, message) => {
+      const player = this.state.players.get(client.id);
+      player.uid = message.id;
     });
 
     this.onMessage('GHOST_PLAYER_COLLISION', (client, message) => {

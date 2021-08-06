@@ -44,7 +44,6 @@ app.post('/auth/user-exists', async (req, res) => {
   try {
     const response = await pool.query(query, [email]);
     res.send(response);
-
   } catch (error) {
     res.send(error);
   }
@@ -64,7 +63,6 @@ app.get('/auth/user-is-authenticated/:tokenID', async (req, res) => {
     console.log(e);
     res.send(false);
   }
-
 });
 
 app.get('/globalStats', async (req, res) => {
@@ -88,21 +86,12 @@ app.get('/globalStats', async (req, res) => {
 
 //  Create match history for a single user
 app.post('/match-history', async (req, res) => {
-  const { userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten } =
-    req.body;
+  const { userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten } = req.body;
 
   const query =
     'INSERT INTO pacman."MatchHistory"("userId", "gameId", result, "pelletsEaten", "ghostsEaten", "playersEaten", "powerupsEaten") VALUES ($1, $2, $3, $4, $5, $6, $7)';
 
-  const values = [
-    userId,
-    gameId,
-    result,
-    pelletsEaten,
-    ghostsEaten,
-    playersEaten,
-    powerupsEaten
-  ];
+  const values = [userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten];
   try {
     const response = await pool.query(query, values);
     res.send(response);
@@ -155,7 +144,7 @@ async function updateMatchHistory(userId, gameId, result, pelletsEaten, ghostsEa
     console.error(err.stack);
   }
 }
-module.exports = updateMatchHistory;
+export default updateMatchHistory;
 
 gameServer.define('game-room', GameRoom);
 gameServer.listen(port);

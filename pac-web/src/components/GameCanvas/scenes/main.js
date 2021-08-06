@@ -71,7 +71,6 @@ export class MainScene extends Phaser.Scene {
 
     var directionDict = { 0: 'right', 1: 'left', 2: 'up', 3: 'down' };
     var colorDict = { 0: 'yellow', 1: 'red', 2: 'green', 3: 'blue' };
-    var powerUpDict = { superSpeed: 44, sizeIncrease: 45, freezeAoe: 46 };
     for (var x = 0; x < 4; x++) {
       for (var y = 0; y < 4; y++) {
         this.anims.create({
@@ -90,11 +89,11 @@ export class MainScene extends Phaser.Scene {
       repeat: 0,
     });
 
-    window.gameUpdateFn = this.controller.onStateChange(this.updateState);
+    window.gameUpdateFn = this.controller.onStateChange(this.updateState.bind(this));
   }
 
-  updateState = (newState) => {
-    var powerUpDict = {'superSpeed' : 44, 'sizeIncrease': 45, 'freezeAoe' : 46};
+  updateState(newState) {
+    var powerUpDict = { superSpeed: 44, sizeIncrease: 45, freezeAoe: 46 };
 
     if (!newState.gameStarted) return;
     if (!this.players) return;
@@ -255,7 +254,7 @@ export class MainScene extends Phaser.Scene {
           const freezeIntervale = setInterval(() => {
             scale += 0.3;
             if (freeze) {
-              freeze.setScale(scale);
+              freeze.setScale(Math.min(scale, 9.3));
               freeze.x = this.players[playerId].x;
               freeze.y = this.players[playerId].y;
             } else {
@@ -271,7 +270,7 @@ export class MainScene extends Phaser.Scene {
         delete this.unEatenPowerUps[i];
       }
     }
-  };
+  }
 
   update() {
     if (this.playersAlive[this.controller.sessionId]) {
