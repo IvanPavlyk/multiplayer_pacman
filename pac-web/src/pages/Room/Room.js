@@ -24,9 +24,10 @@ const Room = () => {
   useEffect(() => {
     let room = null;
 
-  (async () => {
+    (async () => {
       room = window.room || (await client.joinRoomById(id));
-      if (room == null) return history.push('/');
+      if (room == null) return history.push('/home');
+
       window.room = room;
       setRoom(room);
 
@@ -38,20 +39,21 @@ const Room = () => {
         setGameInstance(<GameCanvas controller={room}/>);
       });
 
+      room.onMessage('ROUND_END', () => {
+      });
+
       room.onMessage('GAME_END', () => {
+        alert('Last Pacman standing has won!');
         setGameInstance(null);
-        setReady(false);
+        leaveGame();
+        history.push('/home');
       });
 
       room.send('PLAYER_READY', { ready });
-
     })();
 
     // leave on umount
-    return (() => {
-      room?.send?.('LEAVE_MATCH');
-      window.room = null;
-    });
+    return leaveGame;
   }, []);
 
   function isRoomAdmin(id) {
@@ -61,6 +63,11 @@ const Room = () => {
 
   function startGame() {
     room.send('START_GAME');
+  }
+
+  function leaveGame() {
+    room?.send?.('LEAVE_MATCH');
+    window.room = null;
   }
 
   function readyUp() {
@@ -125,7 +132,7 @@ const Room = () => {
             <p>
               Room ID:
               <br />
-              {room?.id}
+              <span>{room?.id}</span>
             </p>
           </div>
 

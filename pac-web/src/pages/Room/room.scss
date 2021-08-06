@@ -67,6 +67,8 @@
   padding: 0.8rem 20% 1rem;
   border: 2px solid rgba(white, 0.2);
   border-radius: 8px;
+
+  span { text-transform: initial; }
 }
 
 .invite-url-desc {
