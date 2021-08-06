@@ -43,19 +43,6 @@ class GameRoom extends Room<GameState> {
 
   // Game Mechanics
   startGame(): void {
-    const players = this.state.players;
-    const ghosts = this.state.ghosts;
-
-    // reset attributes for player
-    // players.forEach((player) => {
-    //   player.reset();
-    // });
-
-    // reset attributes for ghost
-    ghosts.forEach((ghost) => {
-      ghost.reset();
-    });
-
     this.state.gameStarted = true;
     this.broadcast('GAME_START');
     this.lock();
@@ -82,6 +69,7 @@ class GameRoom extends Room<GameState> {
     });
     this.state.gameStarted = false;
     this.broadcast('GAME_END');
+
     this.unlock();
 
     players.forEach((player) => {
@@ -95,7 +83,6 @@ class GameRoom extends Room<GameState> {
 
     players.forEach((player) => {
       if (player.alive) playersAlive++;
-      console.log(JSON.stringify(player));
     });
 
     return playersAlive <= 1;
@@ -184,10 +171,10 @@ class GameRoom extends Room<GameState> {
         checkEnd(this.state);
       }
 
-      // if (this.state.gameStarted && this.isRoundOver()) {
-      //   console.log('game over');
-      //   this.endGame();
-      // }
+      if (this.state.gameStarted && this.isRoundOver()) {
+        this.broadcast('ROUND_END');
+        this.endGame();
+      }
     });
 
     this.onMessage('PLAYER_PLAYER_COLLISION', (client, message) => {

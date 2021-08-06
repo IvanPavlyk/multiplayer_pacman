@@ -37,6 +37,11 @@ class Player extends Schema {
     super();
     this.id = client.id;
     this.client = client;
+    this.reset();
+  }
+
+  reset() {
+    this.alive = true;
   }
 }
 

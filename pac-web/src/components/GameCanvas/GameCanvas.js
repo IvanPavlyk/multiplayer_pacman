@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import { IonPhaser } from '@ion-phaser/react';
 import { MainScene } from './scenes/main';
 
-const GameCanvas = React.memo(({ controller, ...rest }) => {
+const GameCanvas = ({ controller, ...rest }) => {
   const gameRef = useRef();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const GameCanvas = React.memo(({ controller, ...rest }) => {
       {...rest}
     />
   );
-});
+};
 
 GameCanvas.displayName = 'GameCanvas';
 export default GameCanvas;

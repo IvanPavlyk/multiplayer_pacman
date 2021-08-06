@@ -12,7 +12,7 @@ const Home = () => {
   const [id, setValue] = useState('');
   const client = useColyseus();
   const history = useHistory();
-  const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com'; //TODO: move to enviornment variable
+  const clientId = '1082753993159-va32d2tcalpqv67hnc0apngd0hsk48e0.apps.googleusercontent.com';
 
   const createAndJoinRoom = async () => {
     const room = window.room = await client.createNewRoom();
@@ -20,8 +20,7 @@ const Home = () => {
   };
 
   const joinRoom = (id) => {
-    if (id)
-      history.push(`/room/${id}`);
+    history.push(`/room/${id}`);
   };
 
   const logoutSuccess = () => {
