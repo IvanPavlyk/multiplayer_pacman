@@ -71,7 +71,8 @@ app.get('/globalStats', async (req, res) => {
   const query = `SELECT SUM("pelletsEaten") AS pelletsEaten,
             COUNT(DISTINCT "gameId") AS gamesPlayed,
             SUM("ghostsEaten") AS ghostsEaten,
-            SUM("playersEaten") AS playersEaten
+            SUM("playersEaten") AS playersEaten,
+            SUM("powerupsEaten") AS powerupsEaten
         FROM pacman."MatchHistory"
   `;
 
@@ -87,11 +88,11 @@ app.get('/globalStats', async (req, res) => {
 
 //  Create match history for a single user
 app.post('/match-history', async (req, res) => {
-  const { userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten } =
+  const { userId, gameId, result, pelletsEaten, ghostsEaten, playersEaten, powerupsEaten } =
     req.body;
 
   const query =
-    'INSERT INTO pacman."MatchHistory"("userId", "gameId", result, "pelletsEaten", "ghostsEaten", "playersEaten") VALUES ($1, $2, $3, $4, $5, $6)';
+    'INSERT INTO pacman."MatchHistory"("userId", "gameId", result, "pelletsEaten", "ghostsEaten", "playersEaten", "powerupsEaten") VALUES ($1, $2, $3, $4, $5, $6, $7)';
 
   const values = [
     userId,
@@ -100,6 +101,7 @@ app.post('/match-history', async (req, res) => {
     pelletsEaten,
     ghostsEaten,
     playersEaten,
+    powerupsEaten
   ];
   try {
     const response = await pool.query(query, values);

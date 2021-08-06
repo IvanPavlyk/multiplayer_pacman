@@ -36,6 +36,10 @@ const GlobalStats = () => {
             <th scope='row'>Total Players Eaten</th>
             <td>{globalStats.playerseaten}</td>
           </tr>
+          <tr>
+            <th scope='row'>Total Power-Ups Eaten</th>
+            <td>{globalStats.powerupseaten}</td>
+          </tr>
         </tbody>
       </table>
     </Container>

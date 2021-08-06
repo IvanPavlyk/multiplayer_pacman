@@ -18,6 +18,7 @@ const Login = () => {
       email: profile.email
     };
     sessionStorage.setItem('tokenId', response.tokenId);
+    sessionStorage.setItem('userName', profile.name);
     sessionStorage.setItem('isAuthenticated', true);
     console.log(response);
 
