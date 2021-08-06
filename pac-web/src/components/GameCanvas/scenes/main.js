@@ -4,6 +4,7 @@ export class MainScene extends Phaser.Scene {
   preload() {
     this.load.image('tiles', '/game-assets/chompermazetiles.png');
     this.load.spritesheet('pacman', '/game-assets/pacman.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('freeze', '/game-assets/freeze_explosion.png', { frameWidth: 100, frameHeight: 100 });
     this.cursors = this.input.keyboard.createCursorKeys();
 
     var json2 = require('../level/map3.json');
@@ -78,39 +79,31 @@ export class MainScene extends Phaser.Scene {
         });
       }
     }
-    // this.anims.create({
-    //   key: 'ghostRight',
-    //   frames: this.anims.generateFrameNumbers('pacman', { start: 56, end: 57}),
-    //   frameRate: 10,
-    //   repeat: -1,
-    // });
-    // this.anims.create({
-    //   key: 'ghostLeft',
-    //   frames: this.anims.generateFrameNumbers('pacman', { start: 58, end: 59}),
-    //   frameRate: 10,
-    //   repeat: -1,
-    // });
-    // this.anims.create({
-    //   key: 'ghostUp',
-    //   frames: this.anims.generateFrameNumbers('pacman', { start: 60, end: 61}),
-    //   frameRate: 10,
-    //   repeat: -1,
-    // });
-    // this.anims.create({
-    //   key: 'ghostDown',
-    //   frames: this.anims.generateFrameNumbers('pacman', { start: 62, end: 63}),
-    //   frameRate: 10,
-    //   repeat: -1,
-    // });
+
+    this.anims.create({
+      key: 'freeze',
+      frames: this.anims.generateFrameNumbers('freeze', { start: 1, end: 23 }),
+      frameRate: 23,
+      repeat: 0,
+    });
 
     this.controller.onStateChange((newState) => {
       newState.players.forEach((player, index) => {
         if (!this.players[index]) {
           this.players[index] = this.physics.add.sprite(-100, -100, 'pacman', 0);
-          this.players[index].setScale(2);
           this.players[index].setDepth(10);
-          this.physics.add.collider(this.players[index], this.BaseLayer);
           this.playersAlive[index] = true;
+          newState.players.forEach((otherPlayer, otherPlayerIndex) => {
+            this.physics.add.overlap(
+              this.players[index],
+              this.players[otherPlayerIndex],
+              function () {
+                this.controller.send('PLAYER_PLAYER_COLLISION', { playerIndex: index, otherPlayerIndex });
+              },
+              null,
+              this
+            );
+          });
         }
 
         if (!player.alive && this.playersAlive[index]) {
@@ -128,35 +121,37 @@ export class MainScene extends Phaser.Scene {
         if (!player.alive) {
           return;
         }
+        this.players[index].setScale(player.radius);
         this.players[index].x = player.x;
         this.players[index].y = player.y;
+        this.players[index].currentPowerUpName = player.currentPowerUpName;
         this.players[index].anims.play('moving', true);
         this.players[index].setTint(Number(`0x${player.tint.substr(1)}`));
         if (player.direction === 'right') {
-          this.players[index].setVelocityX(200);
+          this.players[index].setVelocityX(66 * player.velocity);
           this.players[index].setVelocityY(0);
           this.players[index].flipX = false;
           this.players[index].setRotation(0);
         }
         if (player.direction === 'left') {
-          this.players[index].setVelocityX(-200);
+          this.players[index].setVelocityX(-66 * player.velocity);
           this.players[index].setVelocityY(0);
           this.players[index].flipX = true;
           this.players[index].setRotation(0);
         }
         if (player.direction === 'up') {
           this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(-200);
+          this.players[index].setVelocityY(-66 * player.velocity);
           this.players[index].flipX = true;
           this.players[index].setRotation(3.14 / 2);
         }
         if (player.direction === 'down') {
           this.players[index].setVelocityX(0);
-          this.players[index].setVelocityY(200);
+          this.players[index].setVelocityY(66 * player.velocity);
           this.players[index].flipX = true;
           this.players[index].setRotation(-3.14 / 2);
         }
-        if (player.velocity === 0) {
+        if (player.stopped) {
           this.players[index].setVelocityX(0);
           this.players[index].setVelocityY(0);
           this.players[index].anims.play('moving', false);
@@ -177,29 +172,28 @@ export class MainScene extends Phaser.Scene {
       }
 
       newState.ghosts.forEach((ghost, index) => {
-        if (!this.ghosts[index]) {
+        if (ghost.alive && !this.ghosts[index]) {
           this.ghostsAlive[index] = true;
           this.ghosts[index] = this.physics.add.sprite(-100, -100, 'pacman', 52);
           this.ghosts[index].setScale(2);
-          this.players[index].setDepth(9);
+          this.ghosts[index].setDepth(9);
           this.physics.add.collider(this.ghosts[index], this.BaseLayer);
-          this.physics.add.overlap(
-            this.players[index],
-            this.ghosts[index],
-            function () {
-              this.controller.send('GHOST_PLAYER_COLLISION', { id: index });
-            },
-            null,
-            this
-          );
+          newState.players.forEach((player, playerIndex) => {
+            this.physics.add.overlap(
+              this.players[playerIndex],
+              this.ghosts[index],
+              function () {
+                this.controller.send('GHOST_PLAYER_COLLISION', { playerIndex, ghostIndex: index });
+              },
+              null,
+              this
+            );
+          });
         }
         if (!ghost.alive && this.ghostsAlive[index]) {
           this.ghostsAlive[index] = false;
-          this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(0);
-          this.ghosts[index].flipX = false;
-          this.ghosts[index].setRotation(0);
           this.ghosts[index].destroy();
+          delete this.ghosts[index];
           return;
         }
         if (!ghost.alive) {
@@ -208,50 +202,76 @@ export class MainScene extends Phaser.Scene {
         this.ghosts[index].x = ghost.x;
         this.ghosts[index].y = ghost.y;
         if (ghost.direction === 'right') {
-          this.ghosts[index].setVelocityX(67);
+          this.ghosts[index].setVelocityX(67 * ghost.velocity);
           this.ghosts[index].setVelocityY(0);
           this.ghosts[index].anims.play(`ghostright${ghost.color}`, true);
         }
         if (ghost.direction === 'left') {
-          this.ghosts[index].setVelocityX(-67);
+          this.ghosts[index].setVelocityX(-67 * ghost.velocity);
           this.ghosts[index].setVelocityY(0);
           this.ghosts[index].anims.play(`ghostleft${ghost.color}`, true);
         }
         if (ghost.direction === 'up') {
           this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(-67);
+          this.ghosts[index].setVelocityY(-67 * ghost.velocity);
           this.ghosts[index].anims.play(`ghostup${ghost.color}`, true);
         }
         if (ghost.direction === 'down') {
           this.ghosts[index].setVelocityX(0);
-          this.ghosts[index].setVelocityY(67);
+          this.ghosts[index].setVelocityY(67 * ghost.velocity);
           this.ghosts[index].anims.play(`ghostdown${ghost.color}`, true);
         }
       });
 
-      newState.powerUps.forEach((powerUp) => {
-        if (this.unEatenPowerUps[powerUp.spawnTime] && powerUp.endTime) {
-          console.log(powerUp.endTime);
-          this.unEatenPowerUps[powerUp.spawnTime].endTime = powerUp.endTime;
-        }
-        if (!powerUp.id && !this.unEatenPowerUps[powerUp.spawnTime]) {
-          this.unEatenPowerUps[powerUp.spawnTime] = {
+      newState.powerUps.forEach((powerUp, key) => {
+        if (!this.unEatenPowerUps[key]) {
+          this.unEatenPowerUps[key] = {
             sprite: this.physics.add.sprite(
               powerUp.x * 32 + 16,
               powerUp.y * 32 + 16,
               'pacman',
               powerUpDict[powerUp.name]
             ),
-            endTime: powerUp.endTime,
+            powerUp: powerUp.name,
           };
-          this.unEatenPowerUps[powerUp.spawnTime].sprite.setScale(2);
-        } else if (powerUp.id && this.unEatenPowerUps[powerUp.spawnTime]) {
-          this.unEatenPowerUps[powerUp.spawnTime].sprite.destroy();
-          setTimeout(() => {
-            delete this.unEatenPowerUps[powerUp.spawnTime];
-          }, 100);
+          this.unEatenPowerUps[key].sprite.setScale(2);
         }
       });
+      for (let i in this.unEatenPowerUps) {
+        if (!newState.powerUps[i]) {
+          if (this.unEatenPowerUps[i].powerUp === 'freezeAoe') {
+            let playerId = undefined;
+            for (let player in this.players) {
+              if (i === this.players[player].currentPowerUpName) {
+                playerId = player;
+                break;
+              }
+            }
+            console.log(playerId);
+            let freeze = this.physics.add.sprite(this.players[playerId].x, this.players[playerId].y, 'freeze', 1);
+            freeze.anims.play('freeze', true);
+            let scale = 0.3;
+            freeze.setDepth(3);
+            freeze.setScale(scale);
+            const freezeIntervale = setInterval(() => {
+              scale += 0.3;
+              if (freeze) {
+                freeze.setScale(scale);
+                freeze.x = this.players[playerId].x;
+                freeze.y = this.players[playerId].y;
+              } else {
+                clearInterval(freezeIntervale);
+              }
+            }, 3);
+            freeze.on('animationcomplete', () => {
+              freeze.destroy();
+              freeze = undefined;
+            });
+          }
+          this.unEatenPowerUps[i].sprite.destroy();
+          delete this.unEatenPowerUps[i];
+        }
+      }
     });
   }
 
