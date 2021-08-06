@@ -78,7 +78,7 @@ export class MainScene extends Phaser.Scene {
         });
       }
     }
-    
+
     this.controller.onStateChange((newState) => {
       newState.players.forEach((player, index) => {
         if (!this.players[index]) {
@@ -87,7 +87,7 @@ export class MainScene extends Phaser.Scene {
           // this.physics.add.collider(this.players[index], this.BaseLayer);
           this.playersAlive[index] = true;
         }
-        
+
         if (!player.alive && this.playersAlive[index]) {
           this.playersAlive[index] = false;
           this.players[index].setVelocityX(0);
@@ -138,7 +138,7 @@ export class MainScene extends Phaser.Scene {
           this.players[index].anims.play('moving', false);
         }
       });
-      
+
       for (let session in this.players) {
         if (!newState.players.get(session)) {
           this.players[session].destroy();
@@ -151,7 +151,7 @@ export class MainScene extends Phaser.Scene {
           delete this.ghosts[session];
         }
       }
-      
+
       newState.ghosts.forEach((ghost, index) => {
         if (ghost.alive && !this.ghosts[index]) {
           this.ghostsAlive[index] = true;
@@ -159,12 +159,12 @@ export class MainScene extends Phaser.Scene {
           this.ghosts[index].setScale(2);
           this.ghosts[index].setDepth(9);
           this.physics.add.collider(this.ghosts[index], this.BaseLayer);
-          newState.players.forEach((player, playerIndex)=>{
+          newState.players.forEach((player, playerIndex) => {
             this.physics.add.overlap(
               this.players[playerIndex],
               this.ghosts[index],
               function () {
-                this.controller.send('GHOST_PLAYER_COLLISION', {playerIndex, ghostIndex: index });
+                this.controller.send('GHOST_PLAYER_COLLISION', { playerIndex, ghostIndex: index });
               },
               null,
               this
@@ -174,7 +174,7 @@ export class MainScene extends Phaser.Scene {
         if (!ghost.alive && this.ghostsAlive[index]) {
           this.ghostsAlive[index] = false;
           this.ghosts[index].destroy();
-          delete this.ghosts[index];  
+          delete this.ghosts[index];
           return;
         }
         if (!ghost.alive) {
@@ -203,42 +203,41 @@ export class MainScene extends Phaser.Scene {
           this.ghosts[index].anims.play(`ghostdown${ghost.color}`, true);
         }
       });
-      
+
       newState.powerUps.forEach((powerUp, key) => {
         if (!this.unEatenPowerUps[key]) {
-          this.unEatenPowerUps[key] = 
-          this.physics.add.sprite(
+          this.unEatenPowerUps[key] = this.physics.add.sprite(
             powerUp.x * 32 + 16,
             powerUp.y * 32 + 16,
             'pacman',
             powerUpDict[powerUp.name]
-            );
-            this.unEatenPowerUps[key].setScale(2);
-          } 
-        });
-        for(let i in this.unEatenPowerUps){
-          if(!newState.powerUps[i]){
-            this.unEatenPowerUps[i].destroy();
-            delete this.unEatenPowerUps[i];
-          }
+          );
+          this.unEatenPowerUps[key].setScale(2);
         }
       });
-    }
-    
-    update() {
-      if (this.playersAlive[this.controller.sessionId]) {
-        if (this.input.keyboard.checkDown(this.cursors.right, 100)) {
-          this.controller.send('moving', { queuedDirection: 'right' });
-        } else if (this.input.keyboard.checkDown(this.cursors.left, 100)) {
-          this.controller.send('moving', { queuedDirection: 'left' });
-        } else if (this.input.keyboard.checkDown(this.cursors.down, 100)) {
-          this.controller.send('moving', { queuedDirection: 'down' });
-        } else if (this.input.keyboard.checkDown(this.cursors.up, 100)) {
-          this.controller.send('moving', { queuedDirection: 'up' });
+      for (let i in this.unEatenPowerUps) {
+        if (!newState.powerUps[i]) {
+          this.unEatenPowerUps[i].destroy();
+          delete this.unEatenPowerUps[i];
         }
       }
-      this.controller.state.pellets.forEach((ele, index) => {
-        this.PelletsLayer.layer.data[Math.floor(index / this.PelletsLayer.layer.width)][
+    });
+  }
+
+  update() {
+    if (this.playersAlive[this.controller.sessionId]) {
+      if (this.input.keyboard.checkDown(this.cursors.right, 100)) {
+        this.controller.send('moving', { queuedDirection: 'right' });
+      } else if (this.input.keyboard.checkDown(this.cursors.left, 100)) {
+        this.controller.send('moving', { queuedDirection: 'left' });
+      } else if (this.input.keyboard.checkDown(this.cursors.down, 100)) {
+        this.controller.send('moving', { queuedDirection: 'down' });
+      } else if (this.input.keyboard.checkDown(this.cursors.up, 100)) {
+        this.controller.send('moving', { queuedDirection: 'up' });
+      }
+    }
+    this.controller.state.pellets.forEach((ele, index) => {
+      this.PelletsLayer.layer.data[Math.floor(index / this.PelletsLayer.layer.width)][
         index % this.PelletsLayer.layer.width
       ].setVisible(ele);
     });
