@@ -7,6 +7,15 @@ import PowerUp from '../schema/PowerUp';
 function mod(n, m) {
   return ((n % m) + m) % m;
 }
+function resetDefault(player){
+  player.velocity = player.normalVelocity;
+  //if not ghost
+  if(player.radius){
+    player.radius = player.normalRadius;
+  }
+  player.currentPowerUp = undefined;
+  player.endTime = 0;
+}
 
 class GameRoom extends Room<GameState> {
   maxClients = 4;
@@ -29,6 +38,7 @@ class GameRoom extends Room<GameState> {
   }
 
   onCreate(): void {
+
     this.setState(new GameState());
     const powerUps = ['superSpeed', 'sizeIncrease', 'freezeAoe'];
     const powerUpDict = { superSpeed: 3000, sizeIncrease: 5000, freezeAoe: 4000 };
@@ -84,13 +94,22 @@ class GameRoom extends Room<GameState> {
     });
 
     this.onMessage('GHOST_PLAYER_COLLISION', (client, message) => {
-      const player = this.state.players.get(message.id);
-      if (player && player.alive) {
-        const ghost = this.state.ghosts.get(message.id);
-        clearInterval(playerCallbacks[message.id]);
-        clearInterval(ghostCallbacks[message.id]);
+      const player = this.state.players.get(message.playerIndex);
+      const playerGhost = this.state.ghosts.get(message.playerIndex);
+      const collisionGhost = this.state.ghosts.get(message.ghostIndex);
+      if(collisionGhost && player && player.alive && player.radius === player.powerUpRadius){
+        collisionGhost.alive = false;
+        collisionGhost.x = 11 * 32 + 16;
+        collisionGhost.y = 8 * 32 + 16;
+        setTimeout(()=>{
+          collisionGhost.alive = true;
+        }, 5000);
+      }
+      else if (player && player.alive) {
+        clearInterval(playerCallbacks[message.playerIndex]);
+        clearInterval(ghostCallbacks[message.playerIndex]);
         player.alive = false;
-        ghost.alive = false;
+        playerGhost.alive = false;
       }
     });
 
@@ -112,26 +131,25 @@ class GameRoom extends Room<GameState> {
       }
 
       if (!powerUpCallbacks) {
-        powerUpCallbacks = setInterval(() => {
-          for (let x = this.state.powerUps.length - 1; x >= 0; x--) {
-            if (this.state.powerUps[x].id && this.state.powerUps[x].endTime < Date.now()) {
-              this.state.powerUps.splice(x, 1);
-            }
-          }
-          if (this.state.powerUps.length >= 10) {
+        powerUpCallbacks = setInterval(()=>{
+          if (this.state.powerUps.size >= 10) {
             return;
           }
           let tempX, tempY;
+          let map = new Array(this.state.width*this.state.height).fill(0);
+          this.state.powerUps.forEach((powerUp)=>{
+            map[powerUp.y*this.state.width + powerUp.x] === 1;
+          })
           do {
             tempX = Math.floor(Math.random() * this.state.width);
             tempY = Math.floor(Math.random() * this.state.height);
           } while (
             this.state.walls[tempX + tempY * this.state.width] ||
-            this.state.powerUps.some((e) => e.x === tempX && e.y === tempY)
+            map[tempX + tempY * this.state.width]
           );
           const randomPowerUp = Math.floor(Math.random() * powerUps.length);
-          this.state.powerUps.push(new PowerUp({ x: tempX, y: tempY, name: powerUps[randomPowerUp] }));
-        }, 10000);
+          this.state.powerUps.set(`${tempX}_${tempY}`, new PowerUp({ x: tempX, y: tempY, name: powerUps[randomPowerUp] }));
+        }, 1000);
       }
       if (!this.state.walls.length) {
         message.walls.forEach((ele) => {
@@ -150,9 +168,15 @@ class GameRoom extends Room<GameState> {
         const dirDict = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] };
         const state = this.state;
         ghostCallbacks[client.id] = setInterval(() => {
+          if(!ghost.alive){
+            return;
+          }
           if (
-            (['right', 'left'].indexOf(ghost.direction) !== -1 && mod(ghost.x, 32) === 16) ||
-            (['up', 'down'].indexOf(ghost.direction) !== -1 && mod(ghost.y, 32) === 16)
+            (['right', 'left'].indexOf(ghost.direction) !== -1 &&  mod(ghost.x, 32) > 16 - ghost.velocity / 1.9 &&
+            mod(ghost.x, 32) < 16 + ghost.velocity / 1.9) ||
+            (['up', 'down'].indexOf(ghost.direction) !== -1 &&  mod(ghost.y, 32) > 16 - ghost.velocity / 1.9 &&
+            mod(ghost.y, 32) < 16 + ghost.velocity / 1.9) ||
+            typeof ghost.direction === 'undefined'
           ) {
             if (ghost.x <= -16) {
               ghost.x = state.width * 32 - 1;
@@ -164,10 +188,12 @@ class GameRoom extends Room<GameState> {
             }
             let walls = ['up', 'down', 'right', 'left'];
             let oppDirection = walls.indexOf(ghost.direction);
-            oppDirection = ((oppDirection + 1) % 2) + Math.floor(oppDirection / 2) * 2;
-            walls = walls.filter(function (value) {
-              return value !== walls[oppDirection];
-            });
+            if(oppDirection !== -1){
+              oppDirection = ((oppDirection + 1) % 2) + Math.floor(oppDirection / 2) * 2;
+              walls = walls.filter(function (value) {
+                return value !== walls[oppDirection];
+              });
+            }
             walls = walls.filter(function (value) {
               if (
                 Math.floor(ghost.x / 32) + dirDict[value][0] === state.width ||
@@ -187,11 +213,23 @@ class GameRoom extends Room<GameState> {
                 )
               );
             });
-            ghost.direction = walls[distWalls.indexOf(Math.min(...distWalls))];
+            let queued = walls[distWalls.indexOf(Math.min(...distWalls))];
+            if (queued !== ghost.direction) {
+              if (['right', 'left'].indexOf(queued) !== -1) {
+                ghost.y = Math.floor(ghost.y / 32) * 32 + 16;
+              }
+              if (['up', 'down'].indexOf(queued) !== -1) {
+                ghost.x = Math.floor(ghost.x / 32) * 32 + 16;
+              }
+              ghost.direction = queued;
+            }
           }
           if (ghost.direction) {
-            ghost.x += dirDict[ghost.direction][0];
-            ghost.y += dirDict[ghost.direction][1];
+            ghost.x += dirDict[ghost.direction][0]*ghost.velocity;
+            ghost.y += dirDict[ghost.direction][1]*ghost.velocity;
+          }
+          if(ghost.endTime && ghost.endTime < Date.now()){
+            resetDefault(ghost);
           }
         }, 10);
       }
@@ -202,11 +240,12 @@ class GameRoom extends Room<GameState> {
           let check = false;
           if (
             (['right', 'left'].indexOf(player.direction) !== -1 &&
-              mod(player.x, 32) > 16 - pacmanBaseVelocity / 2 &&
-              mod(player.x, 32) < 16 + pacmanBaseVelocity / 2) ||
+              mod(player.x, 32) > 16 - player.velocity / 1.9 &&
+              mod(player.x, 32) < 16 + player.velocity / 1.9) ||
             (['up', 'down'].indexOf(player.direction) !== -1 &&
-              mod(player.y, 32) > 16 - pacmanBaseVelocity / 2 &&
-              mod(player.y, 32) < 16 + pacmanBaseVelocity / 2)
+              mod(player.y, 32) > 16 - player.velocity / 1.9 &&
+              mod(player.y, 32) < 16 + player.velocity / 1.9) ||
+              typeof player.direction === 'undefined'
           ) {
             if (player.x <= -16) {
               player.x = state.width * 32 - player.velocity;
@@ -220,17 +259,47 @@ class GameRoom extends Room<GameState> {
               state.pellets[Math.floor(player.x / 32) + Math.floor(player.y / 32) * this.state.width] = 0;
               player.pelletsEaten += 1;
             }
-            const powerUpIndex = this.state.powerUps.findIndex(
-              (powerUp) => Math.floor(player.x / 32) === powerUp.x && Math.floor(player.y / 32) === powerUp.y
-            );
-            if (powerUpIndex !== -1) {
-              this.state.powerUps[powerUpIndex].startTime = Date.now();
-              this.state.powerUps[powerUpIndex].endTime =
-                this.state.powerUps[powerUpIndex].startTime + powerUpDict[this.state.powerUps[powerUpIndex].name];
-              this.state.powerUps[powerUpIndex].id = player.id;
+            const powerUpIndex = `${Math.floor(player.x / 32)}_${Math.floor(player.y / 32)}`;
+            if (this.state.powerUps[powerUpIndex]) {
+              resetDefault(player);
+              
               this.state.powerUps[powerUpIndex].x = -100;
               this.state.powerUps[powerUpIndex].y = -100;
+              if(this.state.powerUps[powerUpIndex].name === powerUps[0]){
+                player.velocity = player.speedUpVelocity;
+                player.currentPowerUp = this.state.powerUps[powerUpIndex].name;
+                player.endTime = Date.now() + powerUpDict[player.currentPowerUp];
+              }
+              if(this.state.powerUps[powerUpIndex].name === powerUps[1]){
+                player.radius = player.powerUpRadius;
+                player.currentPowerUp = this.state.powerUps[powerUpIndex].name;
+                player.endTime = Date.now() + powerUpDict[player.currentPowerUp];
+              }
+              if(this.state.powerUps[powerUpIndex].name === powerUps[2]){
+                this.state.players.forEach((otherPlayer)=>{
+                  if(otherPlayer !== player){
+                    if(Math.sqrt(Math.pow(otherPlayer.x - player.x, 2) + Math.pow(otherPlayer.y - player.y, 2)) < 20*32){
+                      resetDefault(otherPlayer);
+                      otherPlayer.velocity = otherPlayer.slowVelocity;
+                      otherPlayer.currentPowerUp = this.state.powerUps[powerUpIndex].name;
+                      otherPlayer.endTime = Date.now() + powerUpDict[otherPlayer.currentPowerUp];
+                    }
+                  }
+                });
+                this.state.ghosts.forEach((ghost)=>{
+                  if(Math.sqrt(Math.pow(ghost.x - player.x, 2) + Math.pow(ghost.y - player.y, 2)) < 20*32){
+                    resetDefault(ghost);
+                    ghost.velocity = ghost.slowVelocity;
+                    ghost.currentPowerUp = this.state.powerUps[powerUpIndex].name;
+                    ghost.endTime = Date.now() + powerUpDict[ghost.currentPowerUp];
+                  }
+                });
+              }
+              if(this.state.powerUps[powerUpIndex]){
+                this.state.powerUps.delete(powerUpIndex);
+              }
             }
+            
             let walls = ['up', 'down', 'right', 'left'];
             walls = walls.filter(function (value) {
               if (
@@ -251,14 +320,17 @@ class GameRoom extends Room<GameState> {
                 player.x = Math.floor(player.x / 32) * 32 + 16;
               }
               player.direction = player.queuedDirection;
-              player.velocity = 3;
+              player.stopped = false;
             } else if (walls.indexOf(player.direction) === -1) {
-              player.velocity = 0;
+              player.stopped = true;
             }
           }
-          if (player.direction && !check) {
+          if (player.direction && !player.stopped && !check) {
             player.x += dirDict[player.direction][0] * player.velocity;
             player.y += dirDict[player.direction][1] * player.velocity;
+          }
+          if(player.endTime && player.endTime < Date.now()){
+            resetDefault(player);
           }
         }, 10);
       }
